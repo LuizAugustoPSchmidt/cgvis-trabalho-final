@@ -6,16 +6,29 @@
 
 ## Integrantes da dupla
 
-- **Aluno 1 - Nome**: <mark>`<preencher>`</mark>
-- **Aluno 1 - Cartão UFRGS**: <mark>`<preencher>`</mark>
+- **Aluno 1 - Nome**: <mark>`Caetano Szablewski Sabadini`</mark>
+- **Aluno 1 - Cartão UFRGS**: <mark>`00580199`</mark>
 
-- **Aluno 2 - Nome**: <mark>`<preencher>`</mark>
-- **Aluno 2 - Cartão UFRGS**: <mark>`<preencher>`</mark>
+- **Aluno 2 - Nome**: <mark>`Luiz Augusto Ponzoni Schmidt`</mark>
+- **Aluno 2 - Cartão UFRGS**: <mark>`00580108`</mark>
 
 ## Detalhes do que será implementado
 
-- **Título do trabalho**: <mark>`<preencher>`</mark>
-- **Parágrafo curto descrevendo o que será implementado**: <mark>`<preencher>`</mark>
+- **Título do trabalho**: <mark>`Caça nas Estrelas`</mark>
+- **Parágrafo curto descrevendo o que será implementado**: 
+<mark>
+```
+A tarefa a ser implementada é um jogo de _dogfight_ inspirado em __Star Wars: Starfighters (2001)__, no qual os 
+jogadores controlam, com mouse e teclado, um caça estelar que deve destruir outros caças e certos alvos para vencer.
+
+Ambas as partes podem controlar o movimento dos caças, atirar e disparar mísseis contra adversários ou alvos planejados.
+
+Em nossa implementação, os caças inimigos serão controlados por curvas de Bézier, enquanto o jogador controlará o próprio caça. 
+O objetivo do jogador será destruir todos os caças inimigos e um alvo extra, que estará posicionado em uma posição guarnecida
+do mapa
+
+```
+</mark>
 
 ## Especificação visual
 
