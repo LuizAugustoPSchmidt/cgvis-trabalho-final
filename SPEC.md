@@ -63,40 +63,45 @@ do mapa
 > - Coloque aqui **três imagens** capturadas do vídeo acima, que você
 >   irá usar como ilustração para as explicações que vêm abaixo.
 
-![](./spec-imgs/2026-04-26-182502_hyprshot.png)
-![](./spec-imgs/2026-04-26-182514_hyprshot.png)
-![](./spec-imgs/2026-04-26-182531_hyprshot.png)
+Print 1:
+![Print 1](./spec-imgs/2026-04-26-182502_hyprshot.png)
+
+Print 2:
+![Print 2](./spec-imgs/2026-04-26-182514_hyprshot.png)
+
+Print 3:
+![Print 3](./spec-imgs/2026-04-26-182531_hyprshot.png)
 
 ## Especificação textual
 
 Para cada um dos requisitos abaixo (detalhados no [Enunciado do Trabalho final - Moodle](https://moodle.ufrgs.br/mod/assign/view.php?id=6018620)), escreva um parágrafo **curto** explicando como este requisito será atendido, apontando itens específicos do vídeo/imagens que você incluiu acima que atendem estes requisitos.
 
 ### Malhas poligonais complexas
-<mark`As malhas poligonais complexas serão implementadas no cenário, para compor tanto obstáculos espaciais (asteróides; naves-mãe) quanto objetos em movimento (caças; torretas; etc.)`</mark>
+<mark>`As malhas poligonais complexas serão implementadas no cenário, para compor tanto obstáculos espaciais (asteróides e naves-mãe, por exemplo) quanto objetos em movimento (caças; torretas; etc.)`</mark>
 
 ### Transformações geométricas controladas pelo usuário
-<mark>`O jogador poderá entrar em modo de mira, que permitirá a ele fazer o escalamento aumentativo (zoom in) de uma região do seu campo de visão`</mark>
+<mark>`O jogador poderá entrar em modo de mira, que permitirá a ele fazer o escalamento aumentativo (zoom in) de uma região do seu campo de visão. O caça controlado pelo jogador estará sempre se movendo para frente, mas o jogador poderá controlar a rotação da nave, garantindo controle sobre a translação do campo.`</mark>
 
 ### Diferentes tipos de câmeras
-<mark>`<preencher>`</mark>
+<mark>`Haverá uma câmera padrão em terceira pessoa com ponto fixo na parte inferior central da tela. Haverá também um modo de mira, que será implementado por meio de uma câmera em primeira pessoa`</mark>
 
 ### Instâncias de objetos
-<mark>`<preencher>`</mark>
+<mark`Será utilizada instanciação de objetos tanto para os obstáculos do espaço do mapa quanto para os oponentes a se destruir. Além disso, cliques com o mouse instanciarão tiros partindo da nave do jogador. Tiros de oponentes serão instanciados a partir de uma classe similar, possivelmente a mesma, à classe dos tiros do player`</mark>
 
 ### Testes de intersecção
-<mark>`<preencher>`</mark>
+<mark>`O jogador não poderá colidir sua nave contra outros oponentes nem contra os obstáculos no campo. Os tiros disparados também serão objetos contra os quais serão testadas intersecções`</mark>
 
 ### Modelos de Iluminação em todos os objetos
-<mark>`<preencher>`</mark>
+<mark>`Haverá, fora do mapa, uma fonte de iluminação na forma de uma estrela, tratada como emissora de raios paralelos. Daremos preferência a Gouraud Shading, mas trocaremos o modelo caso os resultados não nos agradem. Além disso, tiros serão considerados fontes de luz alongadas`</mark>
 
 ### Mapeamento de texturas em todos os objetos
-<mark>`<preencher>`</mark>
+<mark>`Todos os objetos, com exceção dos tiros, serão texturizados`</mark>
 
 ### Movimentação com curva Bézier cúbica
-<mark>`<preencher>`</mark>
+<mark>`O movimento dos oponentes será controlado por curvas de Bézier cúbicas. Ao chegar ao ponto final da curva, o oponente gerará uma nova curva para movimento, seja calculando nova curva, ou aproveitando uma série de templates de curvas pré-calculados.`</mark>
 
 ### Animações baseadas no tempo ($\Delta t$)
-<mark>`<preencher>`</mark>
+<mark>`Todo o jogo acontecerá seguindo uma sequência temporal artificial, independente da valocidade da CPU. A cada frame, o movimento dos objetos será calculado seguindo um deltaTime definido no código`</mark>
 
 ## Limitações esperadas
 
@@ -107,4 +112,5 @@ Para cada um dos requisitos abaixo (detalhados no [Enunciado do Trabalho final -
 > - Para cada item, **explique por que** não será implementado ou por
 >   que será implementado parcialmente.
 
-<mark>`<preencher>`</mark>
+* O movimento dos oponentes não seguirá o jogador, de forma que eles dificilmente terão contra-ataque eficaz. Isso requereria heurísticas de movimento que fogem ao escopo da disciplina;
+* O lado interno de naves-mãe não será implementado por simplicidade na geração do mapa;
