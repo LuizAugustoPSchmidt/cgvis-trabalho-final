@@ -1,0 +1,7 @@
+#!/bin/bash
+
+case "$1" in
+	"build") cmake -B build -S . && cmake --build build;;
+	"run") cmake --workflow --preset configure-build-run;;
+		
+esac
