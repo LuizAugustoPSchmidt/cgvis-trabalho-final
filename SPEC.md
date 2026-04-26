@@ -16,7 +16,7 @@
 
 - **Título do trabalho**: <mark>`Caça nas Estrelas`</mark>
 - **Parágrafo curto descrevendo o que será implementado**: 
-<mark>```
+```
 A tarefa a ser implementada é um jogo de _aerial dogfight_ inspirado em __Star Wars: Starfighters (2001)__, no qual os 
 jogadores controlam, com mouse e teclado, um caça estelar que deve destruir outros caças e certos alvos para vencer.
 
@@ -27,7 +27,7 @@ Em nossa implementação, os caças inimigos serão controlados por curvas de B�
 O objetivo do jogador será destruir todos os caças inimigos e um alvo extra, que estará posicionado em uma posição guarnecida
 do mapa
 
-```</mark>
+```
 
 ## Especificação visual
 
