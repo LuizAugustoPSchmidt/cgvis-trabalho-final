@@ -18,10 +18,11 @@
 - **Parágrafo curto descrevendo o que será implementado**: 
 <mark>
 ```
-A tarefa a ser implementada é um jogo de _dogfight_ inspirado em __Star Wars: Starfighters (2001)__, no qual os 
+A tarefa a ser implementada é um jogo de _aerial dogfight_ inspirado em __Star Wars: Starfighters (2001)__, no qual os 
 jogadores controlam, com mouse e teclado, um caça estelar que deve destruir outros caças e certos alvos para vencer.
 
 Ambas as partes podem controlar o movimento dos caças, atirar e disparar mísseis contra adversários ou alvos planejados.
+O jogo será jogado em 3a pessoa, com a opção de entrar em "modo de mira" em 1a pessoa.
 
 Em nossa implementação, os caças inimigos serão controlados por curvas de Bézier, enquanto o jogador controlará o próprio caça. 
 O objetivo do jogador será destruir todos os caças inimigos e um alvo extra, que estará posicionado em uma posição guarnecida
@@ -47,7 +48,7 @@ do mapa
 >   do próprio repositório. Mas, garanta que qualquer um tenha
 >   permissão de acesso ao vídeo através deste link.
 
-<mark>`<preencher>`</mark>
+<mark>`https://youtu.be/l2TadylomBY?si=1S9SdurT9xtaeDZD&t=293`</mark>
 
 ### Vídeo - Timestamp
 
@@ -56,8 +57,8 @@ do mapa
 >   será a base de comparação para avaliar se o seu trabalho final
 >   conseguiu ou não reproduzir a referência.
 
-- **Timestamp inicial**: <mark>`<preencher>`</mark>
-- **Timestamp final**: <mark>`<preencher>`</mark>
+- **Timestamp inicial**: <mark>`5:10`</mark>
+- **Timestamp final**: <mark>`5:45`</mark>
 
 ### Imagens
 
@@ -65,17 +66,19 @@ do mapa
 > - Coloque aqui **três imagens** capturadas do vídeo acima, que você
 >   irá usar como ilustração para as explicações que vêm abaixo.
 
-<mark>`<preencher>`</mark>
+![](./spec-imgs/2026-04-26-182502_hyprshot.png)
+![](./spec-imgs/2026-04-26-182514_hyprshot.png)
+![](./spec-imgs/2026-04-26-182531_hyprshot.png)
 
 ## Especificação textual
 
 Para cada um dos requisitos abaixo (detalhados no [Enunciado do Trabalho final - Moodle](https://moodle.ufrgs.br/mod/assign/view.php?id=6018620)), escreva um parágrafo **curto** explicando como este requisito será atendido, apontando itens específicos do vídeo/imagens que você incluiu acima que atendem estes requisitos.
 
 ### Malhas poligonais complexas
-<mark>`<preencher>`</mark>
+<mark`As malhas poligonais complexas serão implementadas no cenário, para compor tanto obstáculos espaciais (asteróides; naves-mãe) quanto objetos em movimento (caças; torretas; etc.)`</mark>
 
 ### Transformações geométricas controladas pelo usuário
-<mark>`<preencher>`</mark>
+<mark>`O jogador poderá entrar em modo de mira, que permitirá a ele fazer o escalamento aumentativo (zoom in) de uma região do seu campo de visão`</mark>
 
 ### Diferentes tipos de câmeras
 <mark>`<preencher>`</mark>
