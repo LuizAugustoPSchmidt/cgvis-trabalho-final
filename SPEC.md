@@ -86,19 +86,19 @@ Para cada um dos requisitos abaixo (detalhados no [Enunciado do Trabalho final -
 <mark>`Haverá uma câmera padrão em terceira pessoa com ponto fixo na parte inferior central da tela. Haverá também um modo de mira, que será implementado por meio de uma câmera em primeira pessoa`</mark>
 
 ### Instâncias de objetos
-<mark`Será utilizada instanciação de objetos tanto para os obstáculos do espaço do mapa quanto para os oponentes a se destruir. Além disso, cliques com o mouse instanciarão tiros partindo da nave do jogador. Tiros de oponentes serão instanciados a partir de uma classe similar, possivelmente a mesma, à classe dos tiros do player`</mark>
+<mark`Todos os objetos serão carregados em memória ao início do programa. A nave do jogador será instanciada apenas uma vez, enquanto as naves oponentes e obstáculos serão instanciados várias vezes`</mark>
 
 ### Testes de intersecção
 <mark>`O jogador não poderá colidir sua nave contra outros oponentes nem contra os obstáculos no campo. Os tiros disparados também serão objetos contra os quais serão testadas intersecções`</mark>
 
 ### Modelos de Iluminação em todos os objetos
-<mark>`Haverá, fora do mapa, uma fonte de iluminação na forma de uma estrela, tratada como emissora de raios paralelos. Daremos preferência a Gouraud Shading, mas trocaremos o modelo caso os resultados não nos agradem. Além disso, tiros serão considerados fontes de luz alongadas`</mark>
+<mark>`Haverá, fora do mapa, uma fonte de iluminação na forma de uma estrela, tratada como emissora de raios paralelos. Além disso, tiros serão considerados fontes de luz alongadas`</mark>
 
 ### Mapeamento de texturas em todos os objetos
 <mark>`Todos os objetos, com exceção dos tiros, serão texturizados`</mark>
 
 ### Movimentação com curva Bézier cúbica
-<mark>`O movimento dos oponentes será controlado por curvas de Bézier cúbicas. Ao chegar ao ponto final da curva, o oponente gerará uma nova curva para movimento, seja calculando nova curva, ou aproveitando uma série de templates de curvas pré-calculados.`</mark>
+<mark>`O movimento dos oponentes será controlado por curvas de Bézier cúbicas. Ao chegar ao ponto final da curva, o oponente gerará uma nova curva para movimento, seja calculando nova curva, ou aproveitando uma série de templates de curvas pré-calculados. Ao passar próximo ao jogador, os caças oponentes passarão a seguir a nava do player pelo mapa`</mark>
 
 ### Animações baseadas no tempo ($\Delta t$)
 <mark>`Todo o jogo acontecerá seguindo uma sequência temporal artificial, independente da valocidade da CPU. A cada frame, o movimento dos objetos será calculado seguindo um deltaTime definido no código`</mark>
@@ -112,5 +112,4 @@ Para cada um dos requisitos abaixo (detalhados no [Enunciado do Trabalho final -
 > - Para cada item, **explique por que** não será implementado ou por
 >   que será implementado parcialmente.
 
-* O movimento dos oponentes não seguirá o jogador, de forma que eles dificilmente terão contra-ataque eficaz. Isso requereria heurísticas de movimento que fogem ao escopo da disciplina;
 * O lado interno de naves-mãe não será implementado por simplicidade na geração do mapa;
