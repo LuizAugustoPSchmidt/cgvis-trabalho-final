@@ -100,6 +100,8 @@ Para cada um dos requisitos abaixo (detalhados no [Enunciado do Trabalho final -
 ### Movimentação com curva Bézier cúbica
 <mark>`O movimento dos oponentes será controlado por curvas de Bézier cúbicas. Ao chegar ao ponto final da curva, o oponente gerará uma nova curva para movimento, seja calculando nova curva, ou aproveitando uma série de templates de curvas pré-calculados. Ao passar próximo ao jogador, os caças oponentes passarão a seguir a nava do player pelo mapa`</mark>
 
+> Comentário Professor: Para esta implementação, algo que você precisarão cuidar é como evitar que a curva de Bézier passe por dentro de algum outro objeto. Também: o que fazer se o objeto colidir com outro objeto ao longo da curva?
+
 ### Animações baseadas no tempo ($\Delta t$)
 <mark>`Todo o jogo acontecerá seguindo uma sequência temporal artificial, independente da valocidade da CPU. A cada frame, o movimento dos objetos será calculado seguindo um deltaTime definido no código`</mark>
 
