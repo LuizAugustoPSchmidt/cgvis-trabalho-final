@@ -324,10 +324,6 @@ int main(int argc, char *argv[]) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-#ifdef __APPLE__
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
   // Pedimos para utilizar o perfil "core", isto é, utilizaremos somente as
   // funções modernas de OpenGL.
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -1915,6 +1911,3 @@ void PrintObjModelInfo(ObjModel *model) {
     printf("\n");
   }
 }
-
-// set makeprg=cd\ ..\ &&\ make\ run\ >/dev/null
-// vim: set spell spelllang=pt_br :
