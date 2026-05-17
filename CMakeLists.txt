@@ -8,6 +8,7 @@
 set(SOURCES
   src/main.cpp
   src/Application.cpp
+  src/opengl_utils.cpp
   src/correcao.cpp
   src/textrendering.cpp
   src/tiny_obj_loader.cpp

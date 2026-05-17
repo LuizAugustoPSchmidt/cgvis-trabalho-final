@@ -2,6 +2,7 @@
 #include "scene.h"
 #include "matrices.h"
 #include "utils.h"
+#include "opengl_utils.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdio>
 #include <cstdlib>
