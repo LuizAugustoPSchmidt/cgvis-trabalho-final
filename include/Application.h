@@ -56,9 +56,11 @@ private:
       ThirdPerson,
       FirstPerson
   };
-  CameraMode m_CameraMode = CameraMode::ThirdPerson;
-
-  float m_CameraDistance = 3.5f;
+    CameraMode m_CameraMode = CameraMode::ThirdPerson;
+    
+    float m_CameraTheta = 0.0f;
+    float m_CameraPhi = 0.0f;
+    float m_CameraDistance = 3.5f;
   float m_CameraHeight = 1.0f;
   bool m_UsePerspectiveProjection = true;
 
@@ -67,13 +69,13 @@ private:
   glm::vec4 m_CameraUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 
   // Spaceship State
-  glm::vec4 m_SpaceshipPosition = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-  glm::vec4 m_SpaceshipForward = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
-  glm::vec4 m_SpaceshipUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+    glm::vec4 m_SpaceshipPosition = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 m_SpaceshipForward = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+    glm::vec4 m_SpaceshipUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 
     // Other State
-    bool m_ShowInfoText = true;
-    float m_ForearmAngleZ = 0.0f;
+  bool m_ShowInfoText = true;
+  float m_ForearmAngleZ = 0.0f;
   float m_ForearmAngleX = 0.0f;
   float m_TorsoPositionX = 0.0f;
   float m_TorsoPositionY = 0.0f;

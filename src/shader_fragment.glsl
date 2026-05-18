@@ -116,7 +116,7 @@ void main()
 		if (object_id == SPHERE)
             Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
         else
-            Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
+            Kd0 = texture(TextureImage2, vec2(U*2.0, V*2.0)).rgb;
     }
     else if ( object_id == BUNNY )
     {
