@@ -15,6 +15,7 @@ public:
     GLuint GetID() const { return m_ID; }
 
     void SetInt(const std::string& name, int value) const;
+    void SetBool(const std::string& name, bool value) const;
     void SetFloat(const std::string& name, float value) const;
     void SetVec4(const std::string& name, const glm::vec4& value) const;
     void SetMat4(const std::string& name, const glm::mat4& value) const;

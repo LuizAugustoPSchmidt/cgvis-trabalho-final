@@ -5,14 +5,14 @@
 - [x] Adicionar modelos nossos - Caetano
 - [ ] Texturização
   - [ ] Objetos específicos (asteróides) - Luiz
-  - [ ] Background - Luiz
+  - [x] Background - Luiz
 
 ## Até 17-05
 
 - [ ] Câmera
   - [ ] Movimentação - Caetano
   - [ ] Projeções - Caetano
-  - [ ] Troca de TPV para FPV - Luiz
+  - [x] Troca de TPV para FPV - Luiz
 
 ## Se der, mas pronto para entrega final
 

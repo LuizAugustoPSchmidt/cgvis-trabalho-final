@@ -101,29 +101,29 @@ void Application::LoadAssets(int argc, char *argv[]) {
   LoadModel("../../data/spaceship.obj");
 
   m_SpaceshipParts = {
-      {"Cube", SPACESHIP_MATERIAL},
-      {"Cube_motor_0", SPACESHIP_MOTOR},
-      {"asas_CASCO_ESCURO_1_0", SPACESHIP_CASCO_ESCURO_1},
-      {"asas_Casco_0", SPACESHIP_CASCO},
-      {"asas_csaco_escuro_0", SPACESHIP_CSACO_ESCURO},
-      {"asas_fundo_0", SPACESHIP_FUNDO},
-      {"asas_Turbina_0", SPACESHIP_TURBINA},
-      {"asas_FUNDO_2_0", SPACESHIP_FUNDO_2},
-      {"asas_queimado_0", SPACESHIP_QUEIMADO},
-      {"asas_motor_0", SPACESHIP_MOTOR},
-      {"asas_pintura_0", SPACESHIP_PINTURA},
-      {"asas_luz_turbina_0", SPACESHIP_LUZ_TURBINA},
-      {"casco_queimado_0", SPACESHIP_QUEIMADO},
-      {"casco_Casco_0", SPACESHIP_CASCO},
-      {"casco_Cabine_0", SPACESHIP_CABINE},
-      {"casco_ponta_0", SPACESHIP_PONTA},
-      {"casco_pintura_0", SPACESHIP_PINTURA},
-      {"casco_vidro_0", SPACESHIP_VIDRO},
-      {"casco_fundo_0", SPACESHIP_FUNDO},
-      {"robo_motor_0", SPACESHIP_MOTOR},
-      {"robo_and_0", SPACESHIP_MATERIAL},
-      {"robo_Material.001_0", SPACESHIP_MATERIAL_001},
-      {"robo_pintura_0", SPACESHIP_PINTURA},
+      {"Cube", SPACESHIP_MATERIAL, true},
+      {"Cube_motor_0", SPACESHIP_MOTOR, false},
+      {"asas_CASCO_ESCURO_1_0", SPACESHIP_CASCO_ESCURO_1, false},
+      {"asas_Casco_0", SPACESHIP_CASCO, false},
+      {"asas_csaco_escuro_0", SPACESHIP_CSACO_ESCURO, false},
+      {"asas_fundo_0", SPACESHIP_FUNDO, false},
+      {"asas_Turbina_0", SPACESHIP_TURBINA, false},
+      {"asas_FUNDO_2_0", SPACESHIP_FUNDO_2, false},
+      {"asas_queimado_0", SPACESHIP_QUEIMADO, false},
+      {"asas_motor_0", SPACESHIP_MOTOR, false},
+      {"asas_pintura_0", SPACESHIP_PINTURA, false},
+      {"asas_luz_turbina_0", SPACESHIP_LUZ_TURBINA, false},
+      {"casco_queimado_0", SPACESHIP_QUEIMADO, true},
+      {"casco_Casco_0", SPACESHIP_CASCO, true},
+      {"casco_Cabine_0", SPACESHIP_CABINE, true},
+      {"casco_ponta_0", SPACESHIP_PONTA, true},
+      {"casco_pintura_0", SPACESHIP_PINTURA, true},
+      {"casco_vidro_0", SPACESHIP_VIDRO, true},
+      {"casco_fundo_0", SPACESHIP_FUNDO, true},
+      {"robo_motor_0", SPACESHIP_MOTOR, false},
+      {"robo_and_0", SPACESHIP_MATERIAL, false},
+      {"robo_Material.001_0", SPACESHIP_MATERIAL_001, false},
+      {"robo_pintura_0", SPACESHIP_PINTURA, false},
   };
 
   if (argc > 1) {
@@ -209,34 +209,39 @@ void Application::Render() {
           m_CameraPosition.x, m_CameraPosition.y, m_CameraPosition.z
       ) *
       Matrix_Scale(50.0f, 50.0f, 50.0f);
-  DrawObject("the_sphere", BACKGROUND, model);
+  DrawObject("the_sphere", BACKGROUND, model, false);
   glEnable(GL_CULL_FACE);
 
   model = Matrix_Identity();
 
   // Spaceship
-  // Since our spaceship faces some direction, we need to build its model matrix
-  // correctly using position, forward and up vectors.
-  // For now, let's just use its position and identity rotation if it's
-  // stationary. We should eventually derive rotation from forward/up.
   model =
       Matrix_Translate(
           m_SpaceshipPosition.x, m_SpaceshipPosition.y, m_SpaceshipPosition.z
       ) *
       Matrix_Scale(0.1f, 0.1f, 0.1f);
   for (const auto &part : m_SpaceshipParts) {
-    DrawObject(part.name, part.object_id, model);
+    if (part.flip_normals) {
+      glFrontFace(GL_CW);
+    } else {
+      glFrontFace(GL_CCW);
+    }
+    DrawObject(part.name, part.object_id, model, part.flip_normals);
   }
+  glFrontFace(GL_CCW); // Revert to default after the loop
 
   TextRendering_ShowFramesPerSecond();
 }
 
-void Application::DrawObject(const char *name, int id, const glm::mat4 &model) {
+void Application::DrawObject(
+    const char *name, int id, const glm::mat4 &model, bool flip_normals
+) {
   GLint bbox_min_uniform = m_MainShader->GetUniformLocation("bbox_min");
   GLint bbox_max_uniform = m_MainShader->GetUniformLocation("bbox_max");
 
   m_MainShader->SetMat4("model", model);
   m_MainShader->SetInt("object_id", id);
+  m_MainShader->SetBool("flip_normals", flip_normals);
   DrawVirtualObject(name, m_VirtualScene, bbox_min_uniform, bbox_max_uniform);
 }
 

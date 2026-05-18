@@ -95,12 +95,13 @@ private:
   void TextRendering_ShowProjection();
   void TextRendering_ShowFramesPerSecond();
 
-  void LoadModel(const char* path);
-  void DrawObject(const char* name, int id, const glm::mat4& model);
+    void LoadModel(const char* path);
+    void DrawObject(const char* name, int id, const glm::mat4& model, bool flip_normals = false);
 
   struct SpaceshipPart {
       const char *name;
       int object_id;
+      bool flip_normals;
   };
   std::vector<SpaceshipPart> m_SpaceshipParts;
   };

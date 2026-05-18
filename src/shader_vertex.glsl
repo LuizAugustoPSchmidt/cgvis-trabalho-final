@@ -10,6 +10,7 @@ layout (location = 2) in vec2 texture_coefficients;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform bool flip_normals;
 
 // Atributos de vértice que serão gerados como saída ("out") pelo Vertex Shader.
 // ** Estes serão interpolados pelo rasterizador! ** gerando, assim, valores
@@ -60,6 +61,10 @@ void main()
     // Veja slides 123-151 do documento Aula_07_Transformacoes_Geometricas_3D.pdf.
     normal = inverse(transpose(model)) * normal_coefficients;
     normal.w = 0.0;
+
+    if (flip_normals) {
+        normal = -normal;
+    }
 
     // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
     texcoords = texture_coefficients;
