@@ -33,7 +33,16 @@ void TextRendering_PrintString(
     const std::string &str,
     float x,
     float y,
-    float scale = 1.0f
+    float scale = 1.0f,
+    glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)
+);
+void TextRendering_DrawRectangle(
+    GLFWwindow *window,
+    float x,
+    float y,
+    float width,
+    float height,
+    glm::vec4 color
 );
 void TextRendering_PrintMatrix(
     GLFWwindow *window, glm::mat4 M, float x, float y, float scale = 1.0f

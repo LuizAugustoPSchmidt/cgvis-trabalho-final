@@ -10,6 +10,7 @@
 
 #include "utils.h"
 #include "dejavufont.h"
+#include "opengl_utils.h"
 
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Função definida em main.cpp
 
@@ -27,11 +28,16 @@ const GLchar* const textvertexshader_source = ""
 const GLchar* const textfragmentshader_source = ""
 "#version 330\n"
 "uniform sampler2D tex;\n"
+"uniform vec4 color;\n"
+"uniform bool use_texture;\n"
 "in vec2 texCoords;\n"
 "out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
-    "fragColor = vec4(0, 0, 0, texture(tex, texCoords).r);\n"
+    "if (use_texture)\n"
+    "    fragColor = vec4(color.rgb, color.a * texture(tex, texCoords).r);\n"
+    "else\n"
+    "    fragColor = color;\n"
 "}\n"
 "\0";
 
@@ -86,6 +92,8 @@ GLuint textVAO;
 GLuint textVBO;
 GLuint textprogram_id;
 GLuint texttexture_id;
+GLint textcolor_uniform;
+GLint textusetexture_uniform;
 
 void TextRendering_Init()
 {
@@ -115,6 +123,8 @@ void TextRendering_Init()
 
     GLuint texttex_uniform;
     texttex_uniform = glGetUniformLocation(textprogram_id, "tex");
+    textcolor_uniform = glGetUniformLocation(textprogram_id, "color");
+    textusetexture_uniform = glGetUniformLocation(textprogram_id, "use_texture");
     glCheckError();
 
     GLuint textureunit = 31;
@@ -144,13 +154,17 @@ void TextRendering_Init()
 
 float textscale = 1.5f;
 
-void TextRendering_PrintString(GLFWwindow* window, const std::string &str, float x, float y, float scale = 1.0f)
+void TextRendering_PrintString(GLFWwindow* window, const std::string &str, float x, float y, float scale, glm::vec4 color)
 {
     scale *= textscale;
     int width, height;
     glfwGetWindowSize(window, &width, &height);
     float sx = scale / width;
     float sy = scale / height;
+
+    glUseProgram(textprogram_id);
+    glUniform4f(textcolor_uniform, color.r, color.g, color.b, color.a);
+    glUniform1i(textusetexture_uniform, true);
 
     for (size_t i = 0; i < str.size(); i++)
     {
@@ -196,19 +210,51 @@ void TextRendering_PrintString(GLFWwindow* window, const std::string &str, float
         glBufferSubData(GL_ARRAY_BUFFER, 0, 24 * sizeof(float), data);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glUseProgram(textprogram_id);
         glBindVertexArray(textVAO);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glBindVertexArray(0);
-        glUseProgram(0);
         glDepthFunc(GL_LESS);
 
         glDisable(GL_BLEND);
 
         x += (glyph->advance_x * sx);
     }
+    glUseProgram(0);
+}
+
+void TextRendering_DrawRectangle(GLFWwindow* window, float x, float y, float w, float h, glm::vec4 color)
+{
+    struct {float x, y, s, t;} data[6] = {
+        { x,   y,   0, 0 },
+        { x,   y-h, 0, 0 },
+        { x+w, y-h, 0, 0 },
+        { x,   y,   0, 0 },
+        { x+w, y-h, 0, 0 },
+        { x+w, y,   0, 0 }
+    };
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glDepthFunc(GL_ALWAYS);
+    glBindBuffer(GL_ARRAY_BUFFER, textVBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 24 * sizeof(float), data);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glUseProgram(textprogram_id);
+    glUniform4f(textcolor_uniform, color.r, color.g, color.b, color.a);
+    glUniform1i(textusetexture_uniform, false);
+
+    glBindVertexArray(textVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glDepthFunc(GL_LESS);
+    glDisable(GL_BLEND);
 }
 
 float TextRendering_LineHeight(GLFWwindow* window)
@@ -225,7 +271,7 @@ float TextRendering_CharWidth(GLFWwindow* window)
     return dejavufont.glyphs[32].advance_x / width * textscale;
 }
 
-void TextRendering_PrintMatrix(GLFWwindow* window, glm::mat4 M, float x, float y, float scale = 1.0f)
+void TextRendering_PrintMatrix(GLFWwindow* window, glm::mat4 M, float x, float y, float scale)
 {
     char buffer[40];
     float lineheight = TextRendering_LineHeight(window) * scale;
@@ -240,7 +286,7 @@ void TextRendering_PrintMatrix(GLFWwindow* window, glm::mat4 M, float x, float y
     TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
 }
 
-void TextRendering_PrintVector(GLFWwindow* window, glm::vec4 v, float x, float y, float scale = 1.0f)
+void TextRendering_PrintVector(GLFWwindow* window, glm::vec4 v, float x, float y, float scale)
 {
     char buffer[10];
     float lineheight = TextRendering_LineHeight(window) * scale;
@@ -255,7 +301,7 @@ void TextRendering_PrintVector(GLFWwindow* window, glm::vec4 v, float x, float y
     TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
 }
 
-void TextRendering_PrintMatrixVectorProduct(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f)
+void TextRendering_PrintMatrixVectorProduct(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale)
 {
     char buffer[70];
     float lineheight = TextRendering_LineHeight(window) * scale;
@@ -271,7 +317,7 @@ void TextRendering_PrintMatrixVectorProduct(GLFWwindow* window, glm::mat4 M, glm
     TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
 }
 
-void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f)
+void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale)
 {
     char buffer[70];
     float lineheight = TextRendering_LineHeight(window) * scale;
@@ -287,7 +333,7 @@ void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow* window, glm::m
     TextRendering_PrintString(window, buffer, x, y - 3*lineheight, scale);
 }
 
-void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f)
+void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale)
 {
     auto r = M*v;
     auto w = r[3];

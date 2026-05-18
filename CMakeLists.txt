@@ -8,6 +8,9 @@
 set(SOURCES
   src/main.cpp
   src/Application.cpp
+  src/Player.cpp
+  src/Asteroid.cpp
+  src/Opponent.cpp
   src/opengl_utils.cpp
   src/correcao.cpp
   src/textrendering.cpp

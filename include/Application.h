@@ -5,6 +5,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include "Asteroid.h"
+#include "Opponent.h"
+#include "Player.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "VertexArray.h"
@@ -26,6 +29,10 @@ public:
   void LoadAssets(int argc, char *argv[]);
   void Run();
   void Shutdown();
+
+  void DrawObject(
+      const char *name, int id, const glm::mat4 &model, bool flip_normals = false
+  );
 
   // Callbacks
   void KeyCallback(int key, int scancode, int action, int mod);
@@ -65,10 +72,10 @@ private:
   glm::vec4 m_CameraLookAt = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
   glm::vec4 m_CameraUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 
-  // Spaceship State
-  glm::vec4 m_SpaceshipPosition = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-  glm::vec4 m_SpaceshipForward = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
-  glm::vec4 m_SpaceshipUp = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+  // Game Objects
+  std::unique_ptr<Player> m_Player;
+  std::vector<std::unique_ptr<Asteroid>> m_Asteroids;
+  std::vector<std::unique_ptr<Opponent>> m_Opponents;
 
   // Other State
   bool m_ShowInfoText = true;
@@ -94,18 +101,5 @@ private:
   void TextRendering_ShowFramesPerSecond();
 
   void LoadModel(const char *path);
-  void DrawObject(
-      const char *name,
-      int id,
-      const glm::mat4 &model,
-      bool flip_normals = false
-  );
-
-  struct SpaceshipPart {
-    const char *name;
-    int object_id;
-    bool flip_normals; // Because we are using a weird model
-  };
-  std::vector<SpaceshipPart> m_SpaceshipParts;
 };
 #endif // APPLICATION_H

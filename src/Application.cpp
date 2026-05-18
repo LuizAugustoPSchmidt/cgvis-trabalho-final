@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "ObjectIds.h"
 #include "matrices.h"
 #include "opengl_utils.h"
 #include "scene.h"
@@ -86,24 +87,6 @@ bool Application::Init() {
   return true;
 }
 
-#define SPACESHIP_MATERIAL 3
-#define SPACESHIP_MOTOR 4
-#define SPACESHIP_CASCO_ESCURO_1 5
-#define SPACESHIP_CASCO 6
-#define SPACESHIP_CSACO_ESCURO 7
-#define SPACESHIP_FUNDO 8
-#define SPACESHIP_TURBINA 9
-#define SPACESHIP_FUNDO_2 10
-#define SPACESHIP_QUEIMADO 11
-#define SPACESHIP_PINTURA 12
-#define SPACESHIP_LUZ_TURBINA 13
-#define SPACESHIP_CABINE 14
-#define SPACESHIP_PONTA 15
-#define SPACESHIP_VIDRO 16
-#define SPACESHIP_MATERIAL_001 17
-#define BACKGROUND 18
-#define ASTEROID 19
-
 void Application::LoadAssets(int argc, char *argv[]) {
   const char *backgrounds[] = {"../../data/background.jpg",
                                "../../data/2k_stars_milky_way.jpg"};
@@ -128,9 +111,6 @@ void Application::LoadAssets(int argc, char *argv[]) {
   m_Textures.push_back(
       std::make_unique<Texture>("../../data/rocky_terrain_02_diff_1k.jpg", 1)
   );
-  // m_Textures.push_back(
-  //     std::make_unique<Texture>(backgrounds[random_bg_index], 2)
-  // );
   m_Textures.push_back(
       std::make_unique<Texture>(backgrounds[random_bg_index], 2)
   );
@@ -147,33 +127,31 @@ void Application::LoadAssets(int argc, char *argv[]) {
   LoadModel("../../data/spaceship.obj");
   LoadModel("../../data/rock_001.obj");
 
-  // The booleans are to reference where to invert normals,
-  // because the 3d model we are using is kinda weird
-  m_SpaceshipParts = {
-      {"Cube", SPACESHIP_MATERIAL, true},
-      {"Cube_motor_0", SPACESHIP_MOTOR, false},
-      {"asas_CASCO_ESCURO_1_0", SPACESHIP_CASCO_ESCURO_1, false},
-      {"asas_Casco_0", SPACESHIP_CASCO, false},
-      {"asas_csaco_escuro_0", SPACESHIP_CSACO_ESCURO, false},
-      {"asas_fundo_0", SPACESHIP_FUNDO, false},
-      {"asas_Turbina_0", SPACESHIP_TURBINA, false},
-      {"asas_FUNDO_2_0", SPACESHIP_FUNDO_2, false},
-      {"asas_queimado_0", SPACESHIP_QUEIMADO, false},
-      {"asas_motor_0", SPACESHIP_MOTOR, false},
-      {"asas_pintura_0", SPACESHIP_PINTURA, false},
-      {"asas_luz_turbina_0", SPACESHIP_LUZ_TURBINA, false},
-      {"casco_queimado_0", SPACESHIP_QUEIMADO, true},
-      {"casco_Casco_0", SPACESHIP_CASCO, true},
-      {"casco_Cabine_0", SPACESHIP_CABINE, true},
-      {"casco_ponta_0", SPACESHIP_PONTA, true},
-      {"casco_pintura_0", SPACESHIP_PINTURA, true},
-      {"casco_vidro_0", SPACESHIP_VIDRO, true},
-      {"casco_fundo_0", SPACESHIP_FUNDO, true},
-      {"robo_motor_0", SPACESHIP_MOTOR, false},
-      {"robo_and_0", SPACESHIP_MATERIAL, false},
-      {"robo_Material.001_0", SPACESHIP_MATERIAL_001, false},
-      {"robo_pintura_0", SPACESHIP_PINTURA, false},
-  };
+  m_Player = std::make_unique<Player>();
+
+  m_Asteroids.push_back(
+      std::make_unique<Asteroid>(glm::vec4(15.0f, 2.0f, -20.0f, 1.0f))
+  );
+  m_Asteroids.push_back(
+      std::make_unique<Asteroid>(
+          glm::vec4(-25.0f, 10.0f, -30.0f, 1.0f),
+          glm::vec4(1.0f, 1.0f, 1.0f, 0.0f),
+          Matrix_Rotate_Y(1.0f)
+      )
+  );
+  m_Asteroids.push_back(
+      std::make_unique<Asteroid>(
+          glm::vec4(5.0f, -15.0f, -45.0f, 1.0f),
+          glm::vec4(2.5f, 2.5f, 2.5f, 0.0f)
+      )
+  );
+  m_Asteroids.push_back(
+      std::make_unique<Asteroid>(
+          glm::vec4(-35.0f, -5.0f, 10.0f, 1.0f),
+          glm::vec4(1.0f, 1.0f, 1.0f, 0.0f),
+          Matrix_Rotate_X(0.5f)
+      )
+  );
 
   if (argc > 1) {
     LoadModel(argv[1]);
@@ -204,9 +182,11 @@ void Application::Run() {
 }
 
 void Application::Update(float deltaTime) {
-  m_AsteroidCurveAngle += deltaTime * ASTEROID_CURVE_SPEED;
-  if (m_AsteroidCurveAngle > TWO_PI)
-    m_AsteroidCurveAngle -= TWO_PI;
+  m_Player->Update(deltaTime);
+  for (auto &asteroid : m_Asteroids)
+    asteroid->Update(deltaTime);
+  for (auto &opponent : m_Opponents)
+    opponent->Update(deltaTime);
 
   if (m_CameraMode == CameraMode::ThirdPerson) {
     // TPV: Camera orbits the spaceship based on mouse drag
@@ -215,16 +195,17 @@ void Application::Update(float deltaTime) {
     float z = r * cos(m_CameraPhi) * cos(m_CameraTheta);
     float x = r * cos(m_CameraPhi) * sin(m_CameraTheta);
 
-    m_CameraPosition = m_SpaceshipPosition + glm::vec4(x, y, z, 0.0f);
-    m_CameraLookAt = m_SpaceshipPosition;
-    m_CameraUp = m_SpaceshipUp;
+    m_CameraPosition = m_Player->GetPosition() + glm::vec4(x, y, z, 0.0f);
+    m_CameraLookAt = m_Player->GetPosition();
+    m_CameraUp = m_Player->GetUp();
   } else {
     // FPV (Aim Mode): Camera is in the cockpit
     // We move the camera slightly forward (0.2) and up (0.2) from ship center
-    m_CameraPosition = m_SpaceshipPosition + (m_SpaceshipForward * 0.2f) +
-                       (m_SpaceshipUp * 0.2f);
-    m_CameraLookAt = m_CameraPosition + m_SpaceshipForward;
-    m_CameraUp = m_SpaceshipUp;
+    m_CameraPosition = m_Player->GetPosition() +
+                       (m_Player->GetForward() * 0.2f) +
+                       (m_Player->GetUp() * 0.2f);
+    m_CameraLookAt = m_CameraPosition + m_Player->GetForward();
+    m_CameraUp = m_Player->GetUp();
   }
 }
 
@@ -267,50 +248,12 @@ void Application::Render() {
   DrawObject("the_sphere", BACKGROUND, model, false);
   glEnable(GL_CULL_FACE);
 
-  model = Matrix_Identity();
-
-  // Spaceship
-  model =
-      Matrix_Translate(
-          m_SpaceshipPosition.x, m_SpaceshipPosition.y, m_SpaceshipPosition.z
-      ) *
-      Matrix_Scale(0.1f, 0.1f, 0.1f);
-  for (const auto &part : m_SpaceshipParts) {
-    if (part.flip_normals) {
-      glFrontFace(GL_CW);
-    } else {
-      glFrontFace(GL_CCW);
-    }
-    DrawObject(part.name, part.object_id, model, part.flip_normals);
-  }
-  glFrontFace(GL_CCW); // Revert to default after the loop
-
-  // Asteroids
-  float asteroidCurveTime =
-      ASTEROID_CURVE_T_AMPLITUDE *
-      (sin(m_AsteroidCurveAngle - HALF_PI) + ASTEROID_CURVE_T_OFFSET);
-  glm::vec4 asteroidPosition = CubicBezier(
-      ASTEROID_CURVE_P0,
-      ASTEROID_CURVE_P1,
-      ASTEROID_CURVE_P2,
-      ASTEROID_CURVE_P3,
-      asteroidCurveTime
-  );
-  model = Matrix_Translate(
-              asteroidPosition.x, asteroidPosition.y, asteroidPosition.z
-          ) *
-          Matrix_Rotate_Y(m_AsteroidCurveAngle);
-  DrawObject("rock.001_rock.013", ASTEROID, model);
-
-  model = Matrix_Translate(-25.0f, 10.0f, -30.0f) * Matrix_Rotate_Y(1.0f);
-  DrawObject("rock.001_rock.013", ASTEROID, model);
-
-  model =
-      Matrix_Translate(5.0f, -15.0f, -45.0f) * Matrix_Scale(2.5f, 2.5f, 2.5f);
-  DrawObject("rock.001_rock.013", ASTEROID, model);
-
-  model = Matrix_Translate(-35.0f, -5.0f, 10.0f) * Matrix_Rotate_X(0.5f);
-  DrawObject("rock.001_rock.013", ASTEROID, model);
+  // Render Game Objects
+  m_Player->Render(*this);
+  for (auto &asteroid : m_Asteroids)
+    asteroid->Render(*this);
+  for (auto &opponent : m_Opponents)
+    opponent->Render(*this);
 
   TextRendering_ShowFramesPerSecond();
 }
@@ -386,12 +329,22 @@ void Application::TextRendering_ShowFramesPerSecond() {
   }
   float lineheight = TextRendering_LineHeight(m_Window),
         charwidth = TextRendering_CharWidth(m_Window);
-  TextRendering_PrintString(
+
+  float x = 1.0f - (numchars + 1) * charwidth;
+  float y = 1.0f - lineheight;
+  float rect_w = (numchars + 1) * charwidth;
+  float rect_h = lineheight;
+
+  TextRendering_DrawRectangle(
       m_Window,
-      buffer,
-      1.0f - (numchars + 1) * charwidth,
-      1.0f - lineheight,
-      1.0f
+      x,
+      y + rect_h / 4.0f,
+      rect_w,
+      rect_h,
+      glm::vec4(0.0f, 0.0f, 0.0f, 0.5f)
+  );
+  TextRendering_PrintString(
+      m_Window, buffer, x, y, 1.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
   );
 }
 
