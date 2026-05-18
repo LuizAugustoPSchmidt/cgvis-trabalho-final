@@ -133,7 +133,7 @@ void Application::LoadAssets(int argc, char *argv[]) {
   TextRendering_Init();
 }
 
-void Application::LoadModel(const char* path) {
+void Application::LoadModel(const char *path) {
   ObjModel model(path);
   ComputeNormals(&model);
   BuildTrianglesAndAddToVirtualScene(&model, m_VirtualScene);
@@ -155,7 +155,31 @@ void Application::Run() {
 }
 
 void Application::Update(float deltaTime) {
-  // Logic updates could go here
+  glm::vec3 forward(sin(m_CameraTheta), 0.0f, cos(m_CameraTheta));
+  glm::vec3 right(forward.z, 0.0f, -forward.x);
+  glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+  const float speed = 3.0f;
+  glm::vec3 movement(0.0f, 0.0f, 0.0f);
+
+  if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
+    movement -= forward;
+  if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
+    movement += forward;
+  if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
+    movement -= right;
+  if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
+    movement += right;
+  if (glfwGetKey(m_Window, GLFW_KEY_Z) == GLFW_PRESS)
+    movement -= up;
+  if (glfwGetKey(m_Window, GLFW_KEY_X) == GLFW_PRESS)
+    movement += up;
+
+  if (norm(glm::vec4(movement.x, movement.y, movement.z, 0.0f)) > 0.0f) {
+    movement =
+        movement / norm(glm::vec4(movement.x, movement.y, movement.z, 0.0f));
+    m_CameraTarget += movement * speed * deltaTime;
+  }
 }
 
 void Application::Render() {
@@ -169,8 +193,11 @@ void Application::Render() {
   float z = r * cos(m_CameraPhi) * cos(m_CameraTheta);
   float x = r * cos(m_CameraPhi) * sin(m_CameraTheta);
 
-  glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f);
-  glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+  glm::vec4 camera_position_c = glm::vec4(
+      m_CameraTarget.x + x, m_CameraTarget.y + y, m_CameraTarget.z + z, 1.0f
+  );
+  glm::vec4 camera_lookat_l =
+      glm::vec4(m_CameraTarget.x, m_CameraTarget.y, m_CameraTarget.z, 1.0f);
   glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c;
   glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 
@@ -216,7 +243,7 @@ void Application::Render() {
 
   // Spaceship
   model = Matrix_Translate(0.0f, 0.0f, 0.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f);
-  for (const auto& part : m_SpaceshipParts) {
+  for (const auto &part : m_SpaceshipParts) {
     DrawObject(part.name, part.object_id, model);
   }
 
@@ -225,7 +252,7 @@ void Application::Render() {
   TextRendering_ShowFramesPerSecond();
 }
 
-void Application::DrawObject(const char* name, int id, const glm::mat4& model) {
+void Application::DrawObject(const char *name, int id, const glm::mat4 &model) {
   GLint bbox_min_uniform = m_MainShader->GetUniformLocation("bbox_min");
   GLint bbox_max_uniform = m_MainShader->GetUniformLocation("bbox_max");
 

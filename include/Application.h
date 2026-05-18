@@ -10,6 +10,7 @@
 #include "VertexArray.h"
 #include "scene.h"
 #include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <map>
 #include <memory>
@@ -55,6 +56,7 @@ private:
   float m_CameraTheta = 0.0f;
   float m_CameraPhi = 0.0f;
   float m_CameraDistance = 3.5f;
+  glm::vec3 m_CameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
   bool m_UsePerspectiveProjection = true;
 
   // Other State
