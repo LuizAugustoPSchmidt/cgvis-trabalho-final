@@ -93,7 +93,7 @@ void Application::LoadAssets(int argc, char *argv[]) {
       std::make_unique<Texture>("../../data/rocky_terrain_02_diff_1k.jpg", 1)
   );
   m_Textures.push_back(
-      std::make_unique<Texture>("../../data/background.jpg", 2)
+      std::make_unique<Texture>("../../data/2k_stars_milky_way.jpg", 2)
   );
   m_Textures.back()->SetWrapping(GL_MIRRORED_REPEAT);
 
@@ -155,23 +155,24 @@ void Application::Run() {
 }
 
 void Application::Update(float deltaTime) {
-    if (m_CameraMode == CameraMode::ThirdPerson) {
-        // TPV: Camera orbits the spaceship based on mouse drag
-        float r = m_CameraDistance;
-        float y = r * sin(m_CameraPhi);
-        float z = r * cos(m_CameraPhi) * cos(m_CameraTheta);
-        float x = r * cos(m_CameraPhi) * sin(m_CameraTheta);
+  if (m_CameraMode == CameraMode::ThirdPerson) {
+    // TPV: Camera orbits the spaceship based on mouse drag
+    float r = m_CameraDistance;
+    float y = r * sin(m_CameraPhi);
+    float z = r * cos(m_CameraPhi) * cos(m_CameraTheta);
+    float x = r * cos(m_CameraPhi) * sin(m_CameraTheta);
 
-        m_CameraPosition = m_SpaceshipPosition + glm::vec4(x, y, z, 0.0f);
-        m_CameraLookAt = m_SpaceshipPosition;
-        m_CameraUp = m_SpaceshipUp;
-    } else {
-        // FPV (Aim Mode): Camera is in the cockpit
-        // We move the camera slightly forward (0.2) and up (0.2) from ship center
-        m_CameraPosition = m_SpaceshipPosition + (m_SpaceshipForward * 0.2f) + (m_SpaceshipUp * 0.2f);
-        m_CameraLookAt = m_CameraPosition + m_SpaceshipForward;
-        m_CameraUp = m_SpaceshipUp;
-    }
+    m_CameraPosition = m_SpaceshipPosition + glm::vec4(x, y, z, 0.0f);
+    m_CameraLookAt = m_SpaceshipPosition;
+    m_CameraUp = m_SpaceshipUp;
+  } else {
+    // FPV (Aim Mode): Camera is in the cockpit
+    // We move the camera slightly forward (0.2) and up (0.2) from ship center
+    m_CameraPosition = m_SpaceshipPosition + (m_SpaceshipForward * 0.2f) +
+                       (m_SpaceshipUp * 0.2f);
+    m_CameraLookAt = m_CameraPosition + m_SpaceshipForward;
+    m_CameraUp = m_SpaceshipUp;
+  }
 }
 
 void Application::Render() {
@@ -181,7 +182,8 @@ void Application::Render() {
   m_MainShader->Use();
 
   glm::vec4 camera_view_vector = m_CameraLookAt - m_CameraPosition;
-  glm::mat4 view = Matrix_Camera_View(m_CameraPosition, camera_view_vector, m_CameraUp);
+  glm::mat4 view =
+      Matrix_Camera_View(m_CameraPosition, camera_view_vector, m_CameraUp);
 
   glm::mat4 projection;
   float nearplane = -0.01f; // Closer nearplane for FPV cockpit visibility
@@ -350,7 +352,9 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
   if (key == GLFW_KEY_H && action == GLFW_PRESS)
     m_ShowInfoText = !m_ShowInfoText;
   if (key == GLFW_KEY_C && action == GLFW_PRESS)
-    m_CameraMode = (m_CameraMode == CameraMode::ThirdPerson) ? CameraMode::FirstPerson : CameraMode::ThirdPerson;
+    m_CameraMode = (m_CameraMode == CameraMode::ThirdPerson)
+                       ? CameraMode::FirstPerson
+                       : CameraMode::ThirdPerson;
   if (key == GLFW_KEY_R && action == GLFW_PRESS) {
     // Shader reload logic could be moved here or kept in opengl_utils
     // For now, let's just re-instantiate our Shader object
@@ -392,13 +396,15 @@ void Application::CursorPosCallback(double xpos, double ypos) {
     float dy = ypos - m_LastCursorPosY;
 
     m_CameraTheta -= 0.01f * dx;
-    m_CameraPhi   += 0.01f * dy;
+    m_CameraPhi += 0.01f * dy;
 
     float phimax = 3.141592f / 2;
     float phimin = -phimax;
 
-    if (m_CameraPhi > phimax) m_CameraPhi = phimax;
-    if (m_CameraPhi < phimin) m_CameraPhi = phimin;
+    if (m_CameraPhi > phimax)
+      m_CameraPhi = phimax;
+    if (m_CameraPhi < phimin)
+      m_CameraPhi = phimin;
 
     m_LastCursorPosX = xpos;
     m_LastCursorPosY = ypos;
