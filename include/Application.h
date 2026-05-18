@@ -81,6 +81,11 @@ private:
 
   void LoadModel(const char* path);
   void DrawObject(const char* name, int id, const glm::mat4& model);
-};
 
+  struct SpaceshipPart {
+      const char *name;
+      int object_id;
+  };
+  std::vector<SpaceshipPart> m_SpaceshipParts;
+  };
 #endif // APPLICATION_H

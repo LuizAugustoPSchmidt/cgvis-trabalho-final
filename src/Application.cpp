@@ -59,6 +59,25 @@ bool Application::Init() {
   return true;
 }
 
+#define SPHERE 0
+#define BUNNY 1
+#define PLANE 2
+#define SPACESHIP_MATERIAL 3
+#define SPACESHIP_MOTOR 4
+#define SPACESHIP_CASCO_ESCURO_1 5
+#define SPACESHIP_CASCO 6
+#define SPACESHIP_CSACO_ESCURO 7
+#define SPACESHIP_FUNDO 8
+#define SPACESHIP_TURBINA 9
+#define SPACESHIP_FUNDO_2 10
+#define SPACESHIP_QUEIMADO 11
+#define SPACESHIP_PINTURA 12
+#define SPACESHIP_LUZ_TURBINA 13
+#define SPACESHIP_CABINE 14
+#define SPACESHIP_PONTA 15
+#define SPACESHIP_VIDRO 16
+#define SPACESHIP_MATERIAL_001 17
+
 void Application::LoadAssets(int argc, char *argv[]) {
   m_MainShader = std::make_unique<Shader>(
       "../../src/shader_vertex.glsl", "../../src/shader_fragment.glsl"
@@ -79,7 +98,33 @@ void Application::LoadAssets(int argc, char *argv[]) {
   LoadModel("../../data/sphere.obj");
   LoadModel("../../data/bunny.obj");
   LoadModel("../../data/plane.obj");
-  LoadModel("../../data/low_poly_x_wing.obj");
+  LoadModel("../../data/spaceship.obj");
+
+  m_SpaceshipParts = {
+      {"Cube", SPACESHIP_MATERIAL},
+      {"Cube_motor_0", SPACESHIP_MOTOR},
+      {"asas_CASCO_ESCURO_1_0", SPACESHIP_CASCO_ESCURO_1},
+      {"asas_Casco_0", SPACESHIP_CASCO},
+      {"asas_csaco_escuro_0", SPACESHIP_CSACO_ESCURO},
+      {"asas_fundo_0", SPACESHIP_FUNDO},
+      {"asas_Turbina_0", SPACESHIP_TURBINA},
+      {"asas_FUNDO_2_0", SPACESHIP_FUNDO_2},
+      {"asas_queimado_0", SPACESHIP_QUEIMADO},
+      {"asas_motor_0", SPACESHIP_MOTOR},
+      {"asas_pintura_0", SPACESHIP_PINTURA},
+      {"asas_luz_turbina_0", SPACESHIP_LUZ_TURBINA},
+      {"casco_queimado_0", SPACESHIP_QUEIMADO},
+      {"casco_Casco_0", SPACESHIP_CASCO},
+      {"casco_Cabine_0", SPACESHIP_CABINE},
+      {"casco_ponta_0", SPACESHIP_PONTA},
+      {"casco_pintura_0", SPACESHIP_PINTURA},
+      {"casco_vidro_0", SPACESHIP_VIDRO},
+      {"casco_fundo_0", SPACESHIP_FUNDO},
+      {"robo_motor_0", SPACESHIP_MOTOR},
+      {"robo_and_0", SPACESHIP_MATERIAL},
+      {"robo_Material.001_0", SPACESHIP_MATERIAL_001},
+      {"robo_pintura_0", SPACESHIP_PINTURA},
+  };
 
   if (argc > 1) {
     LoadModel(argv[1]);
@@ -154,10 +199,6 @@ void Application::Render() {
 
   glm::mat4 model = Matrix_Identity();
 
-#define SPHERE 0
-#define BUNNY 1
-#define PLANE 2
-
   // Sphere
   model = Matrix_Translate(-1.0f, 0.0f, 0.0f) * Matrix_Rotate_Z(0.6f) *
           Matrix_Rotate_X(0.2f) *
@@ -172,6 +213,12 @@ void Application::Render() {
   // Plane
   model = Matrix_Translate(0.0f, -1.1f, 0.0f);
   DrawObject("the_plane", PLANE, model);
+
+  // Spaceship
+  model = Matrix_Translate(0.0f, 0.0f, 0.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f);
+  for (const auto& part : m_SpaceshipParts) {
+    DrawObject(part.name, part.object_id, model);
+  }
 
   TextRendering_ShowEulerAngles();
   TextRendering_ShowProjection();
