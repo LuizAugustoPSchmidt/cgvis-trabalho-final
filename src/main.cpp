@@ -409,6 +409,10 @@ int main(int argc, char *argv[]) {
   ComputeNormals(&planemodel);
   BuildTrianglesAndAddToVirtualScene(&planemodel);
 
+  ObjModel spaceshipmodel("../../data/spaceship.obj");
+  ComputeNormals(&spaceshipmodel);
+  BuildTrianglesAndAddToVirtualScene(&spaceshipmodel);
+
   if (argc > 1) {
     ObjModel model(argv[1]);
     BuildTrianglesAndAddToVirtualScene(&model);
@@ -529,6 +533,52 @@ int main(int argc, char *argv[]) {
 #define SPHERE 0
 #define BUNNY 1
 #define PLANE 2
+#define SPACESHIP_MATERIAL 3
+#define SPACESHIP_MOTOR 4
+#define SPACESHIP_CASCO_ESCURO_1 5
+#define SPACESHIP_CASCO 6
+#define SPACESHIP_CSACO_ESCURO 7
+#define SPACESHIP_FUNDO 8
+#define SPACESHIP_TURBINA 9
+#define SPACESHIP_FUNDO_2 10
+#define SPACESHIP_QUEIMADO 11
+#define SPACESHIP_PINTURA 12
+#define SPACESHIP_LUZ_TURBINA 13
+#define SPACESHIP_CABINE 14
+#define SPACESHIP_PONTA 15
+#define SPACESHIP_VIDRO 16
+#define SPACESHIP_MATERIAL_001 17
+
+    struct SpaceshipPart {
+      const char *name;
+      int object_id;
+    };
+
+    const SpaceshipPart spaceship_parts[] = {
+        {"Cube", SPACESHIP_MATERIAL},
+        {"Cube_motor_0", SPACESHIP_MOTOR},
+        {"asas_CASCO_ESCURO_1_0", SPACESHIP_CASCO_ESCURO_1},
+        {"asas_Casco_0", SPACESHIP_CASCO},
+        {"asas_csaco_escuro_0", SPACESHIP_CSACO_ESCURO},
+        {"asas_fundo_0", SPACESHIP_FUNDO},
+        {"asas_Turbina_0", SPACESHIP_TURBINA},
+        {"asas_FUNDO_2_0", SPACESHIP_FUNDO_2},
+        {"asas_queimado_0", SPACESHIP_QUEIMADO},
+        {"asas_motor_0", SPACESHIP_MOTOR},
+        {"asas_pintura_0", SPACESHIP_PINTURA},
+        {"asas_luz_turbina_0", SPACESHIP_LUZ_TURBINA},
+        {"casco_queimado_0", SPACESHIP_QUEIMADO},
+        {"casco_Casco_0", SPACESHIP_CASCO},
+        {"casco_Cabine_0", SPACESHIP_CABINE},
+        {"casco_ponta_0", SPACESHIP_PONTA},
+        {"casco_pintura_0", SPACESHIP_PINTURA},
+        {"casco_vidro_0", SPACESHIP_VIDRO},
+        {"casco_fundo_0", SPACESHIP_FUNDO},
+        {"robo_motor_0", SPACESHIP_MOTOR},
+        {"robo_and_0", SPACESHIP_MATERIAL},
+        {"robo_Material.001_0", SPACESHIP_MATERIAL_001},
+        {"robo_pintura_0", SPACESHIP_PINTURA},
+    };
 
     // Desenhamos o modelo da esfera
     model = Matrix_Translate(-1.0f, 0.0f, 0.0f) * Matrix_Rotate_Z(0.6f) *
@@ -550,6 +600,15 @@ int main(int argc, char *argv[]) {
     glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
     glUniform1i(g_object_id_uniform, PLANE);
     DrawVirtualObject("the_plane");
+
+    // Desenhamos o modelo da nave.
+    model = Matrix_Translate(0.0f, 0.0f, 0.0f) *
+            Matrix_Scale(0.1f, 0.1f, 0.1f);
+    glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+    for (const SpaceshipPart &part : spaceship_parts) {
+      glUniform1i(g_object_id_uniform, part.object_id);
+      DrawVirtualObject(part.name);
+    }
 
     // Imprimimos na tela os ângulos de Euler que controlam a rotação do
     // terceiro cubo.

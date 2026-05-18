@@ -22,6 +22,21 @@ uniform mat4 projection;
 #define SPHERE 0
 #define BUNNY  1
 #define PLANE  2
+#define SPACESHIP_MATERIAL       3
+#define SPACESHIP_MOTOR          4
+#define SPACESHIP_CASCO_ESCURO_1 5
+#define SPACESHIP_CASCO          6
+#define SPACESHIP_CSACO_ESCURO   7
+#define SPACESHIP_FUNDO          8
+#define SPACESHIP_TURBINA        9
+#define SPACESHIP_FUNDO_2        10
+#define SPACESHIP_QUEIMADO       11
+#define SPACESHIP_PINTURA        12
+#define SPACESHIP_LUZ_TURBINA    13
+#define SPACESHIP_CABINE         14
+#define SPACESHIP_PONTA          15
+#define SPACESHIP_VIDRO          16
+#define SPACESHIP_MATERIAL_001   17
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -69,7 +84,7 @@ void main()
     float V = 0.0;
 
 	// Coeficiente de refletância difusa
-	vec3 Kd0;
+	vec3 Kd0 = vec3(0.8, 0.8, 0.8);
 
     if ( object_id == SPHERE )
     {
@@ -134,6 +149,66 @@ void main()
 		// Obtemos a refletância difusa a partir da leitura da imagem TextureImage1
 		Kd0 = texture(TextureImage1, vec2(U,V)).rgb;
     }
+    else if ( object_id == SPACESHIP_MATERIAL )
+    {
+        Kd0 = vec3(0.800000, 0.800000, 0.800000);
+    }
+    else if ( object_id == SPACESHIP_MOTOR )
+    {
+        Kd0 = vec3(0.175291, 0.175291, 0.175291);
+    }
+    else if ( object_id == SPACESHIP_CASCO_ESCURO_1 )
+    {
+        Kd0 = vec3(0.127605, 0.127605, 0.127605);
+    }
+    else if ( object_id == SPACESHIP_CASCO )
+    {
+        Kd0 = vec3(0.822921, 0.805622, 0.821381);
+    }
+    else if ( object_id == SPACESHIP_CSACO_ESCURO )
+    {
+        Kd0 = vec3(0.169657, 0.180242, 0.208220);
+    }
+    else if ( object_id == SPACESHIP_FUNDO )
+    {
+        Kd0 = vec3(0.085026, 0.085026, 0.085026);
+    }
+    else if ( object_id == SPACESHIP_TURBINA )
+    {
+        Kd0 = vec3(0.238216, 0.238216, 0.238216);
+    }
+    else if ( object_id == SPACESHIP_FUNDO_2 )
+    {
+        Kd0 = vec3(0.000000, 0.000000, 0.000000);
+    }
+    else if ( object_id == SPACESHIP_QUEIMADO )
+    {
+        Kd0 = vec3(0.095645, 0.095645, 0.095645);
+    }
+    else if ( object_id == SPACESHIP_PINTURA )
+    {
+        Kd0 = vec3(0.451585, 0.045113, 0.028330);
+    }
+    else if ( object_id == SPACESHIP_LUZ_TURBINA )
+    {
+        Kd0 = vec3(0.800630, 0.005851, 0.005851);
+    }
+    else if ( object_id == SPACESHIP_CABINE )
+    {
+        Kd0 = vec3(0.353214, 0.349111, 0.424897);
+    }
+    else if ( object_id == SPACESHIP_PONTA )
+    {
+        Kd0 = vec3(0.123313, 0.123313, 0.123313);
+    }
+    else if ( object_id == SPACESHIP_VIDRO )
+    {
+        Kd0 = vec3(0.455459, 0.597785, 0.760162);
+    }
+    else if ( object_id == SPACESHIP_MATERIAL_001 )
+    {
+        Kd0 = vec3(0.010219, 0.010219, 0.010219);
+    }
 
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
@@ -158,4 +233,3 @@ void main()
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
     color.rgb = pow(color.rgb, vec3(1.0,1.0,1.0)/2.2);
 } 
-
