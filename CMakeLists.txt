@@ -7,11 +7,17 @@
 #ser compilados.
 set(SOURCES
   src/main.cpp
+  src/Application.cpp
+  src/opengl_utils.cpp
   src/correcao.cpp
   src/textrendering.cpp
   src/tiny_obj_loader.cpp
   src/stb_image.cpp
   src/glad.c
+  src/Shader.cpp
+  src/Texture.cpp
+  src/Buffer.cpp
+  src/VertexArray.cpp
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
