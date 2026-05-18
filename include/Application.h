@@ -78,6 +78,9 @@ private:
   void TextRendering_ShowEulerAngles();
   void TextRendering_ShowProjection();
   void TextRendering_ShowFramesPerSecond();
+
+  void LoadModel(const char* path);
+  void DrawObject(const char* name, int id, const glm::mat4& model);
 };
 
 #endif // APPLICATION_H
