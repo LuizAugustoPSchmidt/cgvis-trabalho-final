@@ -1,5 +1,9 @@
 #include "opengl_utils.h"
 #include "matrices.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "VertexArray.h"
+#include "MeshData.h"
 #include <stb_image.h>
 #include <tiny_obj_loader.h>
 #include <fstream>
@@ -9,18 +13,6 @@
 #include <algorithm>
 
 // Shader loading functions
-GLuint LoadShader_Vertex(const char *filename) {
-  GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
-  LoadShader(filename, vertex_shader_id);
-  return vertex_shader_id;
-}
-
-GLuint LoadShader_Fragment(const char *filename) {
-  GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-  LoadShader(filename, fragment_shader_id);
-  return fragment_shader_id;
-}
-
 void LoadShader(const char *filename, GLuint shader_id) {
   std::ifstream file;
   try {
@@ -97,68 +89,6 @@ GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id) {
   return program_id;
 }
 
-void LoadShadersFromFiles() {
-  GLuint vertex_shader_id = LoadShader_Vertex("../../src/shader_vertex.glsl");
-  GLuint fragment_shader_id = LoadShader_Fragment("../../src/shader_fragment.glsl");
-
-  if (g_GpuProgramID != 0)
-    glDeleteProgram(g_GpuProgramID);
-
-  g_GpuProgramID = CreateGpuProgram(vertex_shader_id, fragment_shader_id);
-
-  g_model_uniform = glGetUniformLocation(g_GpuProgramID, "model");
-  g_view_uniform = glGetUniformLocation(g_GpuProgramID, "view");
-  g_projection_uniform = glGetUniformLocation(g_GpuProgramID, "projection");
-  g_object_id_uniform = glGetUniformLocation(g_GpuProgramID, "object_id");
-  g_bbox_min_uniform = glGetUniformLocation(g_GpuProgramID, "bbox_min");
-  g_bbox_max_uniform = glGetUniformLocation(g_GpuProgramID, "bbox_max");
-
-  glUseProgram(g_GpuProgramID);
-  glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage0"), 0);
-  glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage1"), 1);
-  glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage2"), 2);
-  glUseProgram(0);
-}
-
-// Asset loading functions
-void LoadTextureImage(const char *filename) {
-  printf("Carregando imagem \"%s\"... ", filename);
-  stbi_set_flip_vertically_on_load(true);
-  int width, height, channels;
-  unsigned char *data = stbi_load(filename, &width, &height, &channels, 3);
-
-  if (data == NULL) {
-    fprintf(stderr, "ERROR: Cannot open image file \"%s\".\n", filename);
-    std::exit(EXIT_FAILURE);
-  }
-
-  printf("OK (%dx%d).\n", width, height);
-
-  GLuint texture_id, sampler_id;
-  glGenTextures(1, &texture_id);
-  glGenSamplers(1, &sampler_id);
-
-  glSamplerParameteri(sampler_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glSamplerParameteri(sampler_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glSamplerParameteri(sampler_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glSamplerParameteri(sampler_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-  glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-  glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
-
-  GLuint textureunit = g_NumLoadedTextures;
-  glActiveTexture(GL_TEXTURE0 + textureunit);
-  glBindTexture(GL_TEXTURE_2D, texture_id);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-  glGenerateMipmap(GL_TEXTURE_2D);
-  glBindSampler(textureunit, sampler_id);
-
-  stbi_image_free(data);
-  g_NumLoadedTextures += 1;
-}
-
 void ComputeNormals(ObjModel *model) {
   if (!model->attrib.normals.empty())
     return;
@@ -227,170 +157,105 @@ void ComputeNormals(ObjModel *model) {
   }
 }
 
-void BuildTrianglesAndAddToVirtualScene(ObjModel *model) {
-  GLuint vertex_array_object_id;
-  glGenVertexArrays(1, &vertex_array_object_id);
-  glBindVertexArray(vertex_array_object_id);
+void ExtractMeshData(ObjModel* model, MeshData& out_data) {
+    for (size_t shape = 0; shape < model->shapes.size(); ++shape) {
+        MeshData::ShapeInfo info;
+        info.name = model->shapes[shape].name;
+        info.first_index = out_data.indices.size();
+        size_t num_triangles = model->shapes[shape].mesh.num_face_vertices.size();
+        info.bbox_min = glm::vec3(std::numeric_limits<float>::max());
+        info.bbox_max = glm::vec3(std::numeric_limits<float>::lowest());
 
-  std::vector<GLuint> indices;
-  std::vector<float> model_coefficients;
-  std::vector<float> normal_coefficients;
-  std::vector<float> texture_coefficients;
+        for (size_t triangle = 0; triangle < num_triangles; ++triangle) {
+            for (size_t vertex = 0; vertex < 3; ++vertex) {
+                tinyobj::index_t idx = model->shapes[shape].mesh.indices[3 * triangle + vertex];
+                out_data.indices.push_back(static_cast<unsigned int>(info.first_index + 3 * triangle + vertex));
+                
+                const float vx = model->attrib.vertices[3 * idx.vertex_index + 0];
+                const float vy = model->attrib.vertices[3 * idx.vertex_index + 1];
+                const float vz = model->attrib.vertices[3 * idx.vertex_index + 2];
+                out_data.model_coefficients.push_back(vx);
+                out_data.model_coefficients.push_back(vy);
+                out_data.model_coefficients.push_back(vz);
+                out_data.model_coefficients.push_back(1.0f);
 
-  for (size_t shape = 0; shape < model->shapes.size(); ++shape) {
-    size_t first_index = indices.size();
-    size_t num_triangles = model->shapes[shape].mesh.num_face_vertices.size();
-    auto bbox_min = glm::vec3(std::numeric_limits<float>::max());
-    auto bbox_max = glm::vec3(std::numeric_limits<float>::min());
+                info.bbox_min.x = std::min(info.bbox_min.x, vx);
+                info.bbox_min.y = std::min(info.bbox_min.y, vy);
+                info.bbox_min.z = std::min(info.bbox_min.z, vz);
+                info.bbox_max.x = std::max(info.bbox_max.x, vx);
+                info.bbox_max.y = std::max(info.bbox_max.y, vy);
+                info.bbox_max.z = std::max(info.bbox_max.z, vz);
 
-    for (size_t triangle = 0; triangle < num_triangles; ++triangle) {
-      for (size_t vertex = 0; vertex < 3; ++vertex) {
-        tinyobj::index_t idx = model->shapes[shape].mesh.indices[3 * triangle + vertex];
-        indices.push_back(first_index + 3 * triangle + vertex);
-        const float vx = model->attrib.vertices[3 * idx.vertex_index + 0];
-        const float vy = model->attrib.vertices[3 * idx.vertex_index + 1];
-        const float vz = model->attrib.vertices[3 * idx.vertex_index + 2];
-        model_coefficients.push_back(vx);
-        model_coefficients.push_back(vy);
-        model_coefficients.push_back(vz);
-        model_coefficients.push_back(1.0f);
-        bbox_min.x = std::min(bbox_min.x, vx);
-        bbox_min.y = std::min(bbox_min.y, vy);
-        bbox_min.z = std::min(bbox_min.z, vz);
-        bbox_max.x = std::max(bbox_max.x, vx);
-        bbox_max.y = std::max(bbox_max.y, vy);
-        bbox_max.z = std::max(bbox_max.z, vz);
-
-        if (idx.normal_index != -1) {
-          normal_coefficients.push_back(model->attrib.normals[3 * idx.normal_index + 0]);
-          normal_coefficients.push_back(model->attrib.normals[3 * idx.normal_index + 1]);
-          normal_coefficients.push_back(model->attrib.normals[3 * idx.normal_index + 2]);
-          normal_coefficients.push_back(0.0f);
+                if (idx.normal_index != -1) {
+                    out_data.normal_coefficients.push_back(model->attrib.normals[3 * idx.normal_index + 0]);
+                    out_data.normal_coefficients.push_back(model->attrib.normals[3 * idx.normal_index + 1]);
+                    out_data.normal_coefficients.push_back(model->attrib.normals[3 * idx.normal_index + 2]);
+                    out_data.normal_coefficients.push_back(0.0f);
+                }
+                if (idx.texcoord_index != -1) {
+                    out_data.texture_coefficients.push_back(model->attrib.texcoords[2 * idx.texcoord_index + 0]);
+                    out_data.texture_coefficients.push_back(model->attrib.texcoords[2 * idx.texcoord_index + 1]);
+                }
+            }
         }
-        if (idx.texcoord_index != -1) {
-          texture_coefficients.push_back(model->attrib.texcoords[2 * idx.texcoord_index + 0]);
-          texture_coefficients.push_back(model->attrib.texcoords[2 * idx.texcoord_index + 1]);
-        }
-      }
+        info.num_indices = out_data.indices.size() - info.first_index;
+        out_data.shapes.push_back(info);
     }
-    SceneObject theobject;
-    theobject.name = model->shapes[shape].name;
-    theobject.first_index = first_index;
-    theobject.num_indices = indices.size() - first_index;
-    theobject.rendering_mode = GL_TRIANGLES;
-    theobject.vertex_array_object_id = vertex_array_object_id;
-    theobject.bbox_min = bbox_min;
-    theobject.bbox_max = bbox_max;
-    g_VirtualScene[model->shapes[shape].name] = theobject;
-  }
+}
 
-  auto add_vbo = [](GLuint location, GLint size, const std::vector<float>& data) {
-    GLuint vbo_id;
-    glGenBuffers(1, &vbo_id);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(location);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-  };
+void BuildTrianglesAndAddToVirtualScene(ObjModel *model, std::map<std::string, SceneObject>& scene) {
+    MeshData mesh;
+    ExtractMeshData(model, mesh);
 
-  add_vbo(0, 4, model_coefficients);
-  if (!normal_coefficients.empty()) add_vbo(1, 4, normal_coefficients);
-  if (!texture_coefficients.empty()) add_vbo(2, 2, texture_coefficients);
+    GLuint vao_id;
+    glGenVertexArrays(1, &vao_id);
+    glBindVertexArray(vao_id);
 
-  GLuint indices_id;
-  glGenBuffers(1, &indices_id);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_id);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
-  glBindVertexArray(0);
+    auto upload_vbo = [](GLuint location, GLint size, const std::vector<float>& data) {
+        if (data.empty()) return;
+        GLuint vbo_id;
+        glGenBuffers(1, &vbo_id);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+        glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(location);
+    };
+
+    upload_vbo(0, 4, mesh.model_coefficients);
+    upload_vbo(1, 4, mesh.normal_coefficients);
+    upload_vbo(2, 2, mesh.texture_coefficients);
+
+    GLuint ebo_id;
+    glGenBuffers(1, &ebo_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data(), GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
+
+    for (const auto& shape : mesh.shapes) {
+        SceneObject theobject;
+        theobject.name = shape.name;
+        theobject.first_index = shape.first_index;
+        theobject.num_indices = shape.num_indices;
+        theobject.rendering_mode = GL_TRIANGLES;
+        theobject.vertex_array_object_id = vao_id;
+        theobject.bbox_min = shape.bbox_min;
+        theobject.bbox_max = shape.bbox_max;
+        scene[shape.name] = theobject;
+    }
 }
 
 // Drawing functions
-void DrawVirtualObject(const char *object_name) {
-  glBindVertexArray(g_VirtualScene[object_name].vertex_array_object_id);
-  glm::vec3 bbox_min = g_VirtualScene[object_name].bbox_min;
-  glm::vec3 bbox_max = g_VirtualScene[object_name].bbox_max;
-  glUniform4f(g_bbox_min_uniform, bbox_min.x, bbox_min.y, bbox_min.z, 1.0f);
-  glUniform4f(g_bbox_max_uniform, bbox_max.x, bbox_max.y, bbox_max.z, 1.0f);
-  glDrawElements(g_VirtualScene[object_name].rendering_mode, g_VirtualScene[object_name].num_indices, GL_UNSIGNED_INT, (void *)(g_VirtualScene[object_name].first_index * sizeof(GLuint)));
+void DrawVirtualObject(const char *object_name, const std::map<std::string, SceneObject>& scene, GLint bbox_min_uniform, GLint bbox_max_uniform) {
+  auto it = scene.find(object_name);
+  if (it == scene.end()) return;
+
+  const SceneObject& obj = it->second;
+  glBindVertexArray(obj.vertex_array_object_id);
+  glUniform4f(bbox_min_uniform, obj.bbox_min.x, obj.bbox_min.y, obj.bbox_min.z, 1.0f);
+  glUniform4f(bbox_max_uniform, obj.bbox_max.x, obj.bbox_max.y, obj.bbox_max.z, 1.0f);
+  glDrawElements(obj.rendering_mode, obj.num_indices, GL_UNSIGNED_INT, (void *)(obj.first_index * sizeof(GLuint)));
   glBindVertexArray(0);
-}
-
-// Callbacks
-void FramebufferSizeCallback(GLFWwindow *window, int width, int height) {
-  glViewport(0, 0, width, height);
-  g_ScreenRatio = (float)width / height;
-}
-
-// Matrix stack functions
-void PushMatrix(glm::mat4 M) { g_MatrixStack.push(M); }
-void PopMatrix(glm::mat4 &M) {
-  if (g_MatrixStack.empty()) M = Matrix_Identity();
-  else { M = g_MatrixStack.top(); g_MatrixStack.pop(); }
-}
-
-// Text rendering display functions (declarations found in scene.h)
-void TextRendering_ShowModelViewProjection(GLFWwindow *window, glm::mat4 projection, glm::mat4 view, glm::mat4 model, glm::vec4 p_model) {
-  if (!g_ShowInfoText) return;
-  glm::vec4 p_world = model * p_model;
-  glm::vec4 p_camera = view * p_world;
-  glm::vec4 p_clip = projection * p_camera;
-  glm::vec4 p_ndc = p_clip / p_clip.w;
-  float pad = TextRendering_LineHeight(window);
-  TextRendering_PrintString(window, " Model matrix             Model     In World Coords.", -1.0f, 1.0f - pad, 1.0f);
-  TextRendering_PrintMatrixVectorProduct(window, model, p_model, -1.0f, 1.0f - 2 * pad, 1.0f);
-  TextRendering_PrintString(window, "                                        |  ", -1.0f, 1.0f - 6 * pad, 1.0f);
-  TextRendering_PrintString(window, "                            .-----------'  ", -1.0f, 1.0f - 7 * pad, 1.0f);
-  TextRendering_PrintString(window, "                            V              ", -1.0f, 1.0f - 8 * pad, 1.0f);
-  TextRendering_PrintString(window, " View matrix              World     In Camera Coords.", -1.0f, 1.0f - 9 * pad, 1.0f);
-  TextRendering_PrintMatrixVectorProduct(window, view, p_world, -1.0f, 1.0f - 10 * pad, 1.0f);
-  TextRendering_PrintString(window, "                                        |  ", -1.0f, 1.0f - 14 * pad, 1.0f);
-  TextRendering_PrintString(window, "                            .-----------'  ", -1.0f, 1.0f - 15 * pad, 1.0f);
-  TextRendering_PrintString(window, "                            V              ", -1.0f, 1.0f - 16 * pad, 1.0f);
-  TextRendering_PrintString(window, " Projection matrix        Camera                    In NDC", -1.0f, 1.0f - 17 * pad, 1.0f);
-  TextRendering_PrintMatrixVectorProductDivW(window, projection, p_camera, -1.0f, 1.0f - 18 * pad, 1.0f);
-
-  int width, height;
-  glfwGetFramebufferSize(window, &width, &height);
-  glm::vec2 a = glm::vec2(-1, -1), b = glm::vec2(+1, +1), p = glm::vec2(0, 0), q = glm::vec2(width, height);
-  glm::mat4 viewport_mapping = Matrix((q.x - p.x) / (b.x - a.x), 0.0f, 0.0f, (b.x * p.x - a.x * q.x) / (b.x - a.x), 0.0f, (q.y - p.y) / (b.y - a.y), 0.0f, (b.y * p.y - a.y * q.y) / (b.y - a.y), 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-  TextRendering_PrintString(window, "                                                       |  ", -1.0f, 1.0f - 22 * pad, 1.0f);
-  TextRendering_PrintString(window, "                            .--------------------------'  ", -1.0f, 1.0f - 23 * pad, 1.0f);
-  TextRendering_PrintString(window, "                            V                           ", -1.0f, 1.0f - 24 * pad, 1.0f);
-  TextRendering_PrintString(window, " Viewport matrix           NDC      In Pixel Coords.", -1.0f, 1.0f - 25 * pad, 1.0f);
-  TextRendering_PrintMatrixVectorProductMoreDigits(window, viewport_mapping, p_ndc, -1.0f, 1.0f - 26 * pad, 1.0f);
-}
-
-void TextRendering_ShowEulerAngles(GLFWwindow *window) {
-  if (!g_ShowInfoText) return;
-  float pad = TextRendering_LineHeight(window);
-  char buffer[80];
-  snprintf(buffer, 80, "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n", g_AngleZ, g_AngleY, g_AngleX);
-  TextRendering_PrintString(window, buffer, -1.0f + pad / 10, -1.0f + 2 * pad / 10, 1.0f);
-}
-
-void TextRendering_ShowProjection(GLFWwindow *window) {
-  if (!g_ShowInfoText) return;
-  float lineheight = TextRendering_LineHeight(window), charwidth = TextRendering_CharWidth(window);
-  if (g_UsePerspectiveProjection) TextRendering_PrintString(window, "Perspective", 1.0f - 13 * charwidth, -1.0f + 2 * lineheight / 10, 1.0f);
-  else TextRendering_PrintString(window, "Orthographic", 1.0f - 13 * charwidth, -1.0f + 2 * lineheight / 10, 1.0f);
-}
-
-void TextRendering_ShowFramesPerSecond(GLFWwindow *window) {
-  if (!g_ShowInfoText) return;
-  static float old_seconds = (float)glfwGetTime();
-  static int ellapsed_frames = 0;
-  static char buffer[20] = "?? fps";
-  static int numchars = 7;
-  ellapsed_frames += 1;
-  float seconds = (float)glfwGetTime(), ellapsed_seconds = seconds - old_seconds;
-  if (ellapsed_seconds > 1.0f) {
-    numchars = snprintf(buffer, 20, "%.2f fps", ellapsed_frames / ellapsed_seconds);
-    old_seconds = seconds;
-    ellapsed_frames = 0;
-  }
-  float lineheight = TextRendering_LineHeight(window), charwidth = TextRendering_CharWidth(window);
-  TextRendering_PrintString(window, buffer, 1.0f - (numchars + 1) * charwidth, 1.0f - lineheight, 1.0f);
 }
 
 void PrintObjModelInfo(ObjModel *model) {
