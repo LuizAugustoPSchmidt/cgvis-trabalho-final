@@ -107,6 +107,7 @@ void FramebufferSizeCallback(GLFWwindow *window, int width, int height) {
 }
 
 int main(int argc, char *argv[]) {
+  std::srand(static_cast<unsigned int>(std::time(nullptr)));
   Application app;
   if (!app.Init())
     return EXIT_FAILURE;

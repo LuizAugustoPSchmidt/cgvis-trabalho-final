@@ -38,6 +38,7 @@ uniform mat4 projection;
 #define SPACESHIP_VIDRO          16
 #define SPACESHIP_MATERIAL_001   17
 #define BACKGROUND               18
+#define ASTEROID                 19
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -48,6 +49,7 @@ uniform vec4 bbox_max;
 uniform sampler2D TextureImage0;
 uniform sampler2D TextureImage1;
 uniform sampler2D TextureImage2;
+uniform sampler2D TextureImage3;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -87,7 +89,7 @@ void main()
 	// Coeficiente de refletância difusa
 	vec3 Kd0 = vec3(0.8, 0.8, 0.8);
 
-    if ( object_id == SPHERE || object_id == BACKGROUND )
+    if ( object_id == SPHERE || object_id == BACKGROUND || object_id == ASTEROID )
     {
         // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
         // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
@@ -115,8 +117,10 @@ void main()
 		// Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
 		if (object_id == SPHERE)
             Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
-        else
+        else if (object_id == BACKGROUND)
             Kd0 = texture(TextureImage2, vec2(U*2.0, V*2.0)).rgb;
+        else // ASTEROID
+            Kd0 = texture(TextureImage3, vec2(U, V)).rgb;
     }
     else if ( object_id == BUNNY )
     {

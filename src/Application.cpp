@@ -75,8 +75,16 @@ bool Application::Init() {
 #define SPACESHIP_VIDRO 16
 #define SPACESHIP_MATERIAL_001 17
 #define BACKGROUND 18
+#define ASTEROID 19
 
 void Application::LoadAssets(int argc, char *argv[]) {
+  const char *backgrounds[] = {"../../data/background.jpg",
+                               "../../data/2k_stars_milky_way.jpg"};
+
+  const int random = rand();
+  const int random_bg_index = random % 2;
+  printf("random bg index %d\n", random);
+
   m_MainShader = std::make_unique<Shader>(
       "../../src/shader_vertex.glsl", "../../src/shader_fragment.glsl"
   );
@@ -85,6 +93,7 @@ void Application::LoadAssets(int argc, char *argv[]) {
   m_MainShader->SetInt("TextureImage0", 0);
   m_MainShader->SetInt("TextureImage1", 1);
   m_MainShader->SetInt("TextureImage2", 2);
+  m_MainShader->SetInt("TextureImage3", 3);
 
   m_Textures.push_back(
       std::make_unique<Texture>("../../data/red_brick_diff_1k.jpg", 0)
@@ -92,14 +101,27 @@ void Application::LoadAssets(int argc, char *argv[]) {
   m_Textures.push_back(
       std::make_unique<Texture>("../../data/rocky_terrain_02_diff_1k.jpg", 1)
   );
+  // m_Textures.push_back(
+  //     std::make_unique<Texture>(backgrounds[random_bg_index], 2)
+  // );
   m_Textures.push_back(
-      std::make_unique<Texture>("../../data/2k_stars_milky_way.jpg", 2)
+      std::make_unique<Texture>(backgrounds[random_bg_index], 2)
   );
+
   m_Textures.back()->SetWrapping(GL_MIRRORED_REPEAT);
+
+  m_Textures.push_back(
+      std::make_unique<Texture>(
+          "../../data/black-white-details-moon-texture-concept.jpg", 3
+      )
+  );
 
   LoadModel("../../data/sphere.obj");
   LoadModel("../../data/spaceship.obj");
+  LoadModel("../../data/rock_001.obj");
 
+  // The booleans are to reference where to invert normals,
+  // because the 3d model we are using is kinda weird
   m_SpaceshipParts = {
       {"Cube", SPACESHIP_MATERIAL, true},
       {"Cube_motor_0", SPACESHIP_MOTOR, false},
@@ -231,6 +253,20 @@ void Application::Render() {
     DrawObject(part.name, part.object_id, model, part.flip_normals);
   }
   glFrontFace(GL_CCW); // Revert to default after the loop
+
+  // Asteroids
+  model = Matrix_Translate(15.0f, 2.0f, -20.0f);
+  DrawObject("rock.001_rock.013", ASTEROID, model);
+
+  model = Matrix_Translate(-25.0f, 10.0f, -30.0f) * Matrix_Rotate_Y(1.0f);
+  DrawObject("rock.001_rock.013", ASTEROID, model);
+
+  model =
+      Matrix_Translate(5.0f, -15.0f, -45.0f) * Matrix_Scale(2.5f, 2.5f, 2.5f);
+  DrawObject("rock.001_rock.013", ASTEROID, model);
+
+  model = Matrix_Translate(-35.0f, -5.0f, 10.0f) * Matrix_Rotate_X(0.5f);
+  DrawObject("rock.001_rock.013", ASTEROID, model);
 
   TextRendering_ShowFramesPerSecond();
 }
