@@ -10,6 +10,7 @@ public:
     ~Texture();
 
     void Bind() const;
+    void SetWrapping(GLint mode) const;
     GLuint GetID() const { return m_ID; }
     GLuint GetUnit() const { return m_Unit; }
 

@@ -37,6 +37,7 @@ uniform mat4 projection;
 #define SPACESHIP_PONTA          15
 #define SPACESHIP_VIDRO          16
 #define SPACESHIP_MATERIAL_001   17
+#define BACKGROUND               18
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -86,7 +87,7 @@ void main()
 	// Coeficiente de refletância difusa
 	vec3 Kd0 = vec3(0.8, 0.8, 0.8);
 
-    if ( object_id == SPHERE )
+    if ( object_id == SPHERE || object_id == BACKGROUND )
     {
         // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
         // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
@@ -112,7 +113,10 @@ void main()
         V = (phi + M_PI_2) / M_PI;
 
 		// Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-		Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+		if (object_id == SPHERE)
+            Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
+        else
+            Kd0 = texture(TextureImage2, vec2(U,V)).rgb;
     }
     else if ( object_id == BUNNY )
     {
@@ -213,7 +217,10 @@ void main()
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
 
-    color.rgb = Kd0 * (lambert + 0.01);
+    if (object_id == BACKGROUND)
+        color.rgb = Kd0;
+    else
+        color.rgb = Kd0 * (lambert + 0.01);
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
     // necessário:

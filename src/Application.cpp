@@ -59,9 +59,6 @@ bool Application::Init() {
   return true;
 }
 
-#define SPHERE 0
-#define BUNNY 1
-#define PLANE 2
 #define SPACESHIP_MATERIAL 3
 #define SPACESHIP_MOTOR 4
 #define SPACESHIP_CASCO_ESCURO_1 5
@@ -77,6 +74,7 @@ bool Application::Init() {
 #define SPACESHIP_PONTA 15
 #define SPACESHIP_VIDRO 16
 #define SPACESHIP_MATERIAL_001 17
+#define BACKGROUND 18
 
 void Application::LoadAssets(int argc, char *argv[]) {
   m_MainShader = std::make_unique<Shader>(
@@ -94,10 +92,12 @@ void Application::LoadAssets(int argc, char *argv[]) {
   m_Textures.push_back(
       std::make_unique<Texture>("../../data/rocky_terrain_02_diff_1k.jpg", 1)
   );
+  m_Textures.push_back(
+      std::make_unique<Texture>("../../data/background.jpg", 2)
+  );
+  m_Textures.back()->SetWrapping(GL_MIRRORED_REPEAT);
 
   LoadModel("../../data/sphere.obj");
-  LoadModel("../../data/bunny.obj");
-  LoadModel("../../data/plane.obj");
   LoadModel("../../data/spaceship.obj");
 
   m_SpaceshipParts = {
@@ -133,7 +133,7 @@ void Application::LoadAssets(int argc, char *argv[]) {
   TextRendering_Init();
 }
 
-void Application::LoadModel(const char* path) {
+void Application::LoadModel(const char *path) {
   ObjModel model(path);
   ComputeNormals(&model);
   BuildTrianglesAndAddToVirtualScene(&model, m_VirtualScene);
@@ -155,7 +155,19 @@ void Application::Run() {
 }
 
 void Application::Update(float deltaTime) {
-  // Logic updates could go here
+  if (m_CameraMode == CameraMode::ThirdPerson) {
+    // TPV: Camera is behind and above the spaceship
+    glm::vec4 backward = -m_SpaceshipForward;
+    m_CameraPosition = m_SpaceshipPosition + (backward * m_CameraDistance) +
+                       (m_SpaceshipUp * m_CameraHeight);
+    m_CameraLookAt = m_SpaceshipPosition;
+    m_CameraUp = m_SpaceshipUp;
+  } else {
+    // FPV (Aim Mode): Camera is at the spaceship position, looking forward
+    m_CameraPosition = m_SpaceshipPosition;
+    m_CameraLookAt = m_SpaceshipPosition + m_SpaceshipForward;
+    m_CameraUp = m_SpaceshipUp;
+  }
 }
 
 void Application::Render() {
@@ -164,23 +176,13 @@ void Application::Render() {
 
   m_MainShader->Use();
 
-  float r = m_CameraDistance;
-  float y = r * sin(m_CameraPhi);
-  float z = r * cos(m_CameraPhi) * cos(m_CameraTheta);
-  float x = r * cos(m_CameraPhi) * sin(m_CameraTheta);
-
-  glm::vec4 camera_position_c = glm::vec4(x, y, z, 1.0f);
-  glm::vec4 camera_lookat_l = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-  glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c;
-  glm::vec4 camera_up_vector = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-
-  glm::mat4 view = Matrix_Camera_View(
-      camera_position_c, camera_view_vector, camera_up_vector
-  );
+  glm::vec4 camera_view_vector = m_CameraLookAt - m_CameraPosition;
+  glm::mat4 view =
+      Matrix_Camera_View(m_CameraPosition, camera_view_vector, m_CameraUp);
 
   glm::mat4 projection;
   float nearplane = -0.1f;
-  float farplane = -10.0f;
+  float farplane = -100.0f; // Increased far plane for space
 
   if (m_UsePerspectiveProjection) {
     float field_of_view = 3.141592 / 3.0f;
@@ -197,35 +199,36 @@ void Application::Render() {
   m_MainShader->SetMat4("view", view);
   m_MainShader->SetMat4("projection", projection);
 
-  glm::mat4 model = Matrix_Identity();
+  // Background skybox
+  glDisable(GL_CULL_FACE);
+  glm::mat4 model =
+      Matrix_Translate(
+          m_CameraPosition.x, m_CameraPosition.y, m_CameraPosition.z
+      ) *
+      Matrix_Scale(50.0f, 50.0f, 50.0f);
+  DrawObject("the_sphere", BACKGROUND, model);
+  glEnable(GL_CULL_FACE);
 
-  // Sphere
-  model = Matrix_Translate(-1.0f, 0.0f, 0.0f) * Matrix_Rotate_Z(0.6f) *
-          Matrix_Rotate_X(0.2f) *
-          Matrix_Rotate_Y(m_AngleY + (float)glfwGetTime() * 0.1f);
-  DrawObject("the_sphere", SPHERE, model);
-
-  // Bunny
-  model = Matrix_Translate(1.0f, 0.0f, 0.0f) *
-          Matrix_Rotate_X(m_AngleX + (float)glfwGetTime() * 0.1f);
-  DrawObject("the_bunny", BUNNY, model);
-
-  // Plane
-  model = Matrix_Translate(0.0f, -1.1f, 0.0f);
-  DrawObject("the_plane", PLANE, model);
+  model = Matrix_Identity();
 
   // Spaceship
-  model = Matrix_Translate(0.0f, 0.0f, 0.0f) * Matrix_Scale(0.1f, 0.1f, 0.1f);
-  for (const auto& part : m_SpaceshipParts) {
+  // Since our spaceship faces some direction, we need to build its model matrix
+  // correctly using position, forward and up vectors.
+  // For now, let's just use its position and identity rotation if it's
+  // stationary. We should eventually derive rotation from forward/up.
+  model =
+      Matrix_Translate(
+          m_SpaceshipPosition.x, m_SpaceshipPosition.y, m_SpaceshipPosition.z
+      ) *
+      Matrix_Scale(0.1f, 0.1f, 0.1f);
+  for (const auto &part : m_SpaceshipParts) {
     DrawObject(part.name, part.object_id, model);
   }
 
-  TextRendering_ShowEulerAngles();
-  TextRendering_ShowProjection();
   TextRendering_ShowFramesPerSecond();
 }
 
-void Application::DrawObject(const char* name, int id, const glm::mat4& model) {
+void Application::DrawObject(const char *name, int id, const glm::mat4 &model) {
   GLint bbox_min_uniform = m_MainShader->GetUniformLocation("bbox_min");
   GLint bbox_max_uniform = m_MainShader->GetUniformLocation("bbox_max");
 
@@ -377,14 +380,7 @@ void Application::CursorPosCallback(double xpos, double ypos) {
   if (m_LeftMouseButtonPressed) {
     float dx = xpos - m_LastCursorPosX;
     float dy = ypos - m_LastCursorPosY;
-    m_CameraTheta -= 0.01f * dx;
-    m_CameraPhi += 0.01f * dy;
-    float phimax = 3.141592f / 2;
-    float phimin = -phimax;
-    if (m_CameraPhi > phimax)
-      m_CameraPhi = phimax;
-    if (m_CameraPhi < phimin)
-      m_CameraPhi = phimin;
+    // TBD: Use mouse for spaceship steering
     m_LastCursorPosX = xpos;
     m_LastCursorPosY = ypos;
   }

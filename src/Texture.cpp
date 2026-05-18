@@ -47,3 +47,8 @@ void Texture::Bind() const {
     glBindTexture(GL_TEXTURE_2D, m_ID);
     glBindSampler(m_Unit, m_SamplerID);
 }
+
+void Texture::SetWrapping(GLint mode) const {
+    glSamplerParameteri(m_SamplerID, GL_TEXTURE_WRAP_S, mode);
+    glSamplerParameteri(m_SamplerID, GL_TEXTURE_WRAP_T, mode);
+}
