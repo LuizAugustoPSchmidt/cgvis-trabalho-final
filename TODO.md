@@ -10,12 +10,11 @@
 ## Até 17-05
 
 - [ ] Câmera
-  - [ ] Movimentação - Caetano
   - [ ] Projeções - Caetano
   - [x] Troca de TPV para FPV - Luiz
 
 ## Se der, mas pronto para entrega final
 
 - [ ] Iluminação
-- [ ] Curva de Bezier
+- [x] Curva de Bezier
 - [ ] Colisões
