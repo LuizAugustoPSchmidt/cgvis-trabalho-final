@@ -321,6 +321,28 @@ inline glm::mat4 Matrix_Perspective(float field_of_view, float aspect, float n, 
     return -M*P;
 }
 
+// Matriz de rotação para um objeto "olhar" para um alvo.
+// Alinha o eixo +Z do objeto com o vetor (target - position).
+inline glm::mat4 Matrix_Look_At(glm::vec4 position, glm::vec4 target, glm::vec4 up)
+{
+    glm::vec4 w = target - position; // Direção +Z (aponta para o alvo)
+    float n = norm(w);
+    if (n > 0.0f) w /= n;
+
+    glm::vec4 u = crossproduct(up, w); // Direção +X
+    float nu = norm(u);
+    if (nu > 0.0f) u /= nu;
+
+    glm::vec4 v = crossproduct(w, u); // Direção +Y
+
+    return Matrix(
+        u.x, v.x, w.x, 0.0f,
+        u.y, v.y, w.y, 0.0f,
+        u.z, v.z, w.z, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    );
+}
+
 // Função que imprime uma matriz M no terminal
 inline void PrintMatrix(glm::mat4 M)
 {

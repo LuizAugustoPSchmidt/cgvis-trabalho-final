@@ -3,12 +3,12 @@
 #include "matrices.h"
 #include "opengl_utils.h"
 #include "scene.h"
-#include "utils.h"
+// #include "utils.h"
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
+// #include <iostream>
 
 // External function for automated correction
 void Correcao_KeyCallback(int key, int action, int mod);
@@ -217,12 +217,18 @@ void Application::Update(float deltaTime) {
   m_Player->Update(deltaTime);
   for (auto &asteroid : m_Asteroids)
     asteroid->Update(deltaTime);
-  for (auto &ship : m_TieFighters)
+  for (auto &ship : m_TieFighters) {
+    ship->SetTarget(m_Player->GetPosition());
     ship->Update(deltaTime);
-  for (auto &ship : m_TieDefenders)
+  }
+  for (auto &ship : m_TieDefenders) {
+    ship->SetTarget(m_Player->GetPosition());
     ship->Update(deltaTime);
-  for (auto &ship : m_TiePhantoms)
+  }
+  for (auto &ship : m_TiePhantoms) {
+    ship->SetTarget(m_Player->GetPosition());
     ship->Update(deltaTime);
+  }
 
   if (m_CameraMode == CameraMode::ThirdPerson) {
     // TPV: Camera orbits the spaceship based on mouse drag
@@ -261,6 +267,9 @@ void Application::Render() {
 
   if (m_UsePerspectiveProjection) {
     float field_of_view = 3.141592 / 3.0f;
+#if !RELEASE
+    field_of_view /= m_DebugZoom;
+#endif
     projection =
         Matrix_Perspective(field_of_view, m_ScreenRatio, nearplane, farplane);
   } else {
@@ -442,7 +451,12 @@ void Application::CursorPosCallback(double xpos, double ypos) {
 }
 
 void Application::ScrollCallback(double xoffset, double yoffset) {
-  // Logic removed as requested
+#if !RELEASE
+  m_DebugZoom += (float)yoffset * 0.1f;
+  if (m_DebugZoom < 0.6f)
+    m_DebugZoom = 0.6f;
+  printf("Debug Zoom: %.1f\n", m_DebugZoom);
+#endif
 }
 
 void Application::FramebufferSizeCallback(int width, int height) {

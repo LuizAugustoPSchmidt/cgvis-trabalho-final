@@ -16,7 +16,7 @@ TiePhantom::TiePhantom(glm::vec4 position)
 }
 
 void TiePhantom::Update(float deltaTime) {
-  // Movement logic
+  m_RotationMatrix = Matrix_Look_At(m_Position, m_Target, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
 }
 
 void TiePhantom::Render(Application &app) {
@@ -24,6 +24,7 @@ void TiePhantom::Render(Application &app) {
   // Scale by 2.0 to match TIE Fighter size.
   // Rotate 90 degrees around X to point forward.
   glm::mat4 model = Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
+                    m_RotationMatrix *
                     Matrix_Scale(2.0f, 2.0f, 2.0f) *
                     Matrix_Rotate_X(3 * 3.141592f / 2.0f);
   for (const auto &part : m_Parts) {
