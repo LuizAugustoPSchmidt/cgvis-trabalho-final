@@ -57,6 +57,8 @@ bool Application::Init() {
   glCullFace(GL_BACK);
   glFrontFace(GL_CCW);
 
+  glfwSwapInterval(m_VsyncEnabled ? 1 : 0);
+
   return true;
 }
 
@@ -308,47 +310,6 @@ void Application::DrawObject(
   DrawVirtualObject(name, m_VirtualScene, bbox_min_uniform, bbox_max_uniform);
 }
 
-void Application::TextRendering_ShowEulerAngles() {
-  if (!m_ShowInfoText)
-    return;
-  float pad = TextRendering_LineHeight(m_Window);
-  char buffer[80];
-  snprintf(
-      buffer,
-      80,
-      "Euler Angles rotation matrix = Z(%.2f)*Y(%.2f)*X(%.2f)\n",
-      m_AngleZ,
-      m_AngleY,
-      m_AngleX
-  );
-  TextRendering_PrintString(
-      m_Window, buffer, -1.0f + pad / 10, -1.0f + 2 * pad / 10, 1.0f
-  );
-}
-
-void Application::TextRendering_ShowProjection() {
-  if (!m_ShowInfoText)
-    return;
-  float lineheight = TextRendering_LineHeight(m_Window),
-        charwidth = TextRendering_CharWidth(m_Window);
-  if (m_UsePerspectiveProjection)
-    TextRendering_PrintString(
-        m_Window,
-        "Perspective",
-        1.0f - 13 * charwidth,
-        -1.0f + 2 * lineheight / 10,
-        1.0f
-    );
-  else
-    TextRendering_PrintString(
-        m_Window,
-        "Orthographic",
-        1.0f - 13 * charwidth,
-        -1.0f + 2 * lineheight / 10,
-        1.0f
-    );
-}
-
 void Application::TextRendering_ShowFramesPerSecond() {
   if (!m_ShowInfoText)
     return;
@@ -376,7 +337,7 @@ void Application::TextRendering_ShowFramesPerSecond() {
   TextRendering_DrawRectangle(
       m_Window,
       x,
-      y + rect_h / 4.0f,
+      y + rect_h / 1.25f,
       rect_w,
       rect_h,
       glm::vec4(0.0f, 0.0f, 0.0f, 0.5f)
@@ -399,33 +360,15 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
   if ((key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q) && action == GLFW_PRESS)
     glfwSetWindowShouldClose(m_Window, GL_TRUE);
 
-  float delta = 3.141592 / 16;
-  if (key == GLFW_KEY_X && action == GLFW_PRESS)
-    m_AngleX += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-  if (key == GLFW_KEY_Y && action == GLFW_PRESS)
-    m_AngleY += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-  if (key == GLFW_KEY_Z && action == GLFW_PRESS)
-    m_AngleZ += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-
-  if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-    m_AngleX = 0.0f;
-    m_AngleY = 0.0f;
-    m_AngleZ = 0.0f;
-    m_ForearmAngleX = 0.0f;
-    m_ForearmAngleZ = 0.0f;
-    m_TorsoPositionX = 0.0f;
-    m_TorsoPositionY = 0.0f;
-  }
-  if (key == GLFW_KEY_P && action == GLFW_PRESS)
-    m_UsePerspectiveProjection = true;
-  if (key == GLFW_KEY_O && action == GLFW_PRESS)
-    m_UsePerspectiveProjection = false;
-  if (key == GLFW_KEY_H && action == GLFW_PRESS)
-    m_ShowInfoText = !m_ShowInfoText;
   if (key == GLFW_KEY_C && action == GLFW_PRESS)
     m_CameraMode = (m_CameraMode == CameraMode::ThirdPerson)
                        ? CameraMode::FirstPerson
                        : CameraMode::ThirdPerson;
+  if (key == GLFW_KEY_V && action == GLFW_PRESS) {
+    m_VsyncEnabled = !m_VsyncEnabled;
+    glfwSwapInterval(m_VsyncEnabled ? 1 : 0);
+    printf("V-Sync: %s\n", m_VsyncEnabled ? "ON" : "OFF");
+  }
   if (key == GLFW_KEY_R && action == GLFW_PRESS) {
     // Shader reload logic could be moved here or kept in opengl_utils
     // For now, let's just re-instantiate our Shader object
