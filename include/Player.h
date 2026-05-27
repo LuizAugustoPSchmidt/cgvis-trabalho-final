@@ -25,8 +25,10 @@ public:
   glm::vec4 GetUp() const { return m_Up; }
 
   void SetPosition(glm::vec4 pos) { m_Position = pos; }
+  void SetRotation(float angle) { m_RotationAngle = angle; }
 
 private:
+  float m_RotationAngle = 0.0f;
   glm::vec4 m_Position;
   glm::vec4 m_Forward;
   glm::vec4 m_Up;

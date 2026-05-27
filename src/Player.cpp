@@ -37,13 +37,14 @@ Player::Player()
 }
 
 void Player::Update(float deltaTime) {
-  // Constant forward movement could be added here later
+  m_Forward =
+      glm::vec4(-sin(m_RotationAngle), 0.0f, -cos(m_RotationAngle), 0.0f);
 }
 
 void Player::Render(Application &app) {
   glm::mat4 model =
       Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
-      Matrix_Scale(0.1f, 0.1f, 0.1f);
+      Matrix_Rotate_Y(m_RotationAngle) * Matrix_Scale(0.1f, 0.1f, 0.1f);
 
   for (const auto &part : m_Parts) {
     if (part.flip_normals) {

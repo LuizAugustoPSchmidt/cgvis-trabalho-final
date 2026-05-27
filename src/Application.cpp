@@ -214,6 +214,7 @@ void Application::Run() {
 }
 
 void Application::Update(float deltaTime) {
+  m_Player->SetRotation(m_CameraTheta);
   m_Player->Update(deltaTime);
   for (auto &asteroid : m_Asteroids)
     asteroid->Update(deltaTime);
