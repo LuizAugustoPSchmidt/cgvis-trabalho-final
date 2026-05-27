@@ -13,10 +13,14 @@ public:
   virtual void Update(float deltaTime) override;
   virtual void Render(Application &app) override;
 
+  float GetCurveAngle() const { return m_CurveAngle; }
+
 private:
   glm::vec4 m_Position;
   glm::vec4 m_Scale;
   glm::mat4 m_Rotation;
+  float m_CurveAngle = 0.0f;
+  glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 };
 
 #endif // ASTEROID_H
