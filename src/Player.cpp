@@ -5,7 +5,8 @@
 #include <glad/glad.h>
 
 Player::Player()
-    : m_Position(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
+    : GameObject("spaceship", SPACESHIP_MATERIAL),
+      m_Position(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
       m_Forward(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)),
       m_Up(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)) {
   m_Parts = {

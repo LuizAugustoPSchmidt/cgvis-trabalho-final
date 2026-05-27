@@ -10,7 +10,9 @@ set(SOURCES
   src/Application.cpp
   src/Player.cpp
   src/Asteroid.cpp
-  src/Opponent.cpp
+  src/TieFighter.cpp
+  src/TieDefender.cpp
+  src/TiePhantom.cpp
   src/opengl_utils.cpp
   src/correcao.cpp
   src/textrendering.cpp

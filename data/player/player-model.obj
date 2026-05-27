@@ -1,6 +1,6 @@
 # Blender 5.1.1
 # www.blender.org
-mtllib spaceship.mtl
+mtllib player-model.mtl
 o Cube
 v 1.000000 1.000000 -1.000000
 v 1.000000 -1.000000 -1.000000

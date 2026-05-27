@@ -88,8 +88,9 @@ bool Application::Init() {
 }
 
 void Application::LoadAssets(int argc, char *argv[]) {
-  const char *backgrounds[] = {"../../data/background.jpg",
-                               "../../data/2k_stars_milky_way.jpg"};
+  const char *backgrounds[] = {
+      "../../data/background/background-texture.jpg",
+      "../../data/background/background-texture-2k.jpg"};
 
   const int random = rand();
   const int random_bg_index = random % 2;
@@ -104,28 +105,67 @@ void Application::LoadAssets(int argc, char *argv[]) {
   m_MainShader->SetInt("TextureImage1", 1);
   m_MainShader->SetInt("TextureImage2", 2);
   m_MainShader->SetInt("TextureImage3", 3);
+  m_MainShader->SetInt("TextureImage4", 4);
+  m_MainShader->SetInt("TextureImage5", 5);
+  m_MainShader->SetInt("TextureImage6", 6);
+  m_MainShader->SetInt("TextureImage7", 7);
 
   m_Textures.push_back(
-      std::make_unique<Texture>("../../data/red_brick_diff_1k.jpg", 0)
+      std::make_unique<Texture>("../../data/opponent/opponent-texture.jpg", 0)
   );
+
   m_Textures.push_back(
-      std::make_unique<Texture>("../../data/rocky_terrain_02_diff_1k.jpg", 1)
+      std::make_unique<Texture>(
+          "../../data/asteroid/asteroid-texture-alt.jpg", 1
+      )
   );
+
+  // m_Textures.push_back(
+  //     std::make_unique<Texture>(backgrounds[random_bg_index], 2)
+  // );
   m_Textures.push_back(
-      std::make_unique<Texture>(backgrounds[random_bg_index], 2)
+      std::make_unique<Texture>("../../data/background/bg-white.jpg", 2)
   );
 
   m_Textures.back()->SetWrapping(GL_MIRRORED_REPEAT);
 
   m_Textures.push_back(
-      std::make_unique<Texture>(
-          "../../data/black-white-details-moon-texture-concept.jpg", 3
-      )
+      std::make_unique<Texture>("../../data/asteroid/asteroid-texture.jpg", 3)
   );
 
-  LoadModel("../../data/sphere.obj");
-  LoadModel("../../data/spaceship.obj");
-  LoadModel("../../data/rock_001.obj");
+  m_Textures.push_back(
+      std::make_unique<Texture>(
+          "../../data/tie-fighter/tie-fighter-texture.png", 4
+      )
+  );
+  m_Textures.back()->SetWrapping(GL_REPEAT);
+
+  m_Textures.push_back(
+      std::make_unique<Texture>(
+          "../../data/tie-defender/tie-defender-texture.png", 5
+      )
+  );
+  m_Textures.back()->SetWrapping(GL_REPEAT);
+  m_Textures.push_back(
+      std::make_unique<Texture>(
+          "../../data/tie-phantom/tie-phantom-texture.jpeg", 6
+      )
+  );
+  m_Textures.back()->SetWrapping(GL_REPEAT);
+
+  m_Textures.push_back(
+      std::make_unique<Texture>(
+          "../../data/tie-phantom/tie-phantom-texture-wings.jpeg", 7
+      )
+  );
+  m_Textures.back()->SetWrapping(GL_REPEAT);
+
+  LoadModel("../../data/background/background-model.obj");
+  LoadModel("../../data/player/player-model.obj");
+  LoadModel("../../data/asteroid/asteroid-model.obj");
+  LoadModel("../../data/tie-fighter/tie-fighter-model.obj", "tiefighter_");
+  LoadModel("../../data/tie-defender/tie-defender-model.obj", "tiedefender_");
+  LoadModel("../../data/tie-phantom/tie-phantom-model.obj", "tiephantom_");
 
   m_Player = std::make_unique<Player>();
 
@@ -153,6 +193,22 @@ void Application::LoadAssets(int argc, char *argv[]) {
       )
   );
 
+  float radius = 20.0f;
+  int totalShips = 7;
+  for (int i = 0; i < totalShips; ++i) {
+    float angle = i * (2.0f * 3.14159265f / totalShips);
+    glm::vec4 pos =
+        glm::vec4(radius * sin(angle), 0.0f, radius * cos(angle), 1.0f);
+
+    if (i < 3) {
+      m_TieFighters.push_back(std::make_unique<TieFighter>(pos));
+    } else if (i < 5) {
+      m_TieDefenders.push_back(std::make_unique<TieDefender>(pos));
+    } else {
+      m_TiePhantoms.push_back(std::make_unique<TiePhantom>(pos));
+    }
+  }
+
   if (argc > 1) {
     LoadModel(argv[1]);
   }
@@ -160,10 +216,10 @@ void Application::LoadAssets(int argc, char *argv[]) {
   TextRendering_Init();
 }
 
-void Application::LoadModel(const char *path) {
+void Application::LoadModel(const char *path, const std::string &prefix) {
   ObjModel model(path);
   ComputeNormals(&model);
-  BuildTrianglesAndAddToVirtualScene(&model, m_VirtualScene);
+  BuildTrianglesAndAddToVirtualScene(&model, m_VirtualScene, prefix);
 }
 
 void Application::Run() {
@@ -185,8 +241,12 @@ void Application::Update(float deltaTime) {
   m_Player->Update(deltaTime);
   for (auto &asteroid : m_Asteroids)
     asteroid->Update(deltaTime);
-  for (auto &opponent : m_Opponents)
-    opponent->Update(deltaTime);
+  for (auto &ship : m_TieFighters)
+    ship->Update(deltaTime);
+  for (auto &ship : m_TieDefenders)
+    ship->Update(deltaTime);
+  for (auto &ship : m_TiePhantoms)
+    ship->Update(deltaTime);
 
   if (m_CameraMode == CameraMode::ThirdPerson) {
     // TPV: Camera orbits the spaceship based on mouse drag
@@ -252,8 +312,12 @@ void Application::Render() {
   m_Player->Render(*this);
   for (auto &asteroid : m_Asteroids)
     asteroid->Render(*this);
-  for (auto &opponent : m_Opponents)
-    opponent->Render(*this);
+  for (auto &ship : m_TieFighters)
+    ship->Render(*this);
+  for (auto &ship : m_TieDefenders)
+    ship->Render(*this);
+  for (auto &ship : m_TiePhantoms)
+    ship->Render(*this);
 
   TextRendering_ShowFramesPerSecond();
 }

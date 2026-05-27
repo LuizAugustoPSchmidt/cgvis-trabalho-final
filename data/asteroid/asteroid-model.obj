@@ -1,6 +1,6 @@
 # Blender v2.93.7 OBJ File: 'Asteroids.blend'
 # www.blender.org
-mtllib rock_001.mtl
+mtllib asteroid-model.mtl
 o rock.001_rock.013
 v -3.845096 -0.510118 0.494410
 v -3.778270 -0.659979 0.302764

@@ -203,7 +203,7 @@ void ExtractMeshData(ObjModel* model, MeshData& out_data) {
     }
 }
 
-void BuildTrianglesAndAddToVirtualScene(ObjModel *model, std::map<std::string, SceneObject>& scene) {
+void BuildTrianglesAndAddToVirtualScene(ObjModel *model, std::map<std::string, SceneObject>& scene, const std::string& prefix) {
     MeshData mesh;
     ExtractMeshData(model, mesh);
 
@@ -234,14 +234,15 @@ void BuildTrianglesAndAddToVirtualScene(ObjModel *model, std::map<std::string, S
 
     for (const auto& shape : mesh.shapes) {
         SceneObject theobject;
-        theobject.name = shape.name;
+        std::string final_name = prefix + shape.name;
+        theobject.name = final_name;
         theobject.first_index = shape.first_index;
         theobject.num_indices = shape.num_indices;
         theobject.rendering_mode = GL_TRIANGLES;
         theobject.vertex_array_object_id = vao_id;
         theobject.bbox_min = shape.bbox_min;
         theobject.bbox_max = shape.bbox_max;
-        scene[shape.name] = theobject;
+        scene[final_name] = theobject;
     }
 }
 

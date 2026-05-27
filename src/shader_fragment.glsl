@@ -39,6 +39,10 @@ uniform mat4 projection;
 #define SPACESHIP_MATERIAL_001   17
 #define BACKGROUND               18
 #define ASTEROID                 19
+#define TIE_FIGHTER              20
+#define TIE_DEFENDER             21
+#define TIE_PHANTOM_HULL         22
+#define TIE_PHANTOM_WINGS        23
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -50,6 +54,10 @@ uniform sampler2D TextureImage0;
 uniform sampler2D TextureImage1;
 uniform sampler2D TextureImage2;
 uniform sampler2D TextureImage3;
+uniform sampler2D TextureImage4;
+uniform sampler2D TextureImage5;
+uniform sampler2D TextureImage6;
+uniform sampler2D TextureImage7;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -216,6 +224,30 @@ void main()
     else if ( object_id == SPACESHIP_MATERIAL_001 )
     {
         Kd0 = vec3(0.010219, 0.010219, 0.010219);
+    }
+    else if ( object_id == TIE_FIGHTER )
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd0 = texture(TextureImage4, vec2(U,V)).rgb;
+    }
+    else if ( object_id == TIE_DEFENDER )
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd0 = texture(TextureImage5, vec2(U,V)).rgb;
+    }
+    else if ( object_id == TIE_PHANTOM_HULL )
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd0 = texture(TextureImage6, vec2(U,V)).rgb;
+    }
+    else if ( object_id == TIE_PHANTOM_WINGS )
+    {
+        U = texcoords.x;
+        V = texcoords.y;
+        Kd0 = texture(TextureImage7, vec2(U,V)).rgb;
     }
 
     // Equação de Iluminação

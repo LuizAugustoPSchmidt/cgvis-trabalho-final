@@ -18,7 +18,7 @@ GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id);
 
 // Asset loading functions
 void ExtractMeshData(ObjModel* model, MeshData& out_data);
-void BuildTrianglesAndAddToVirtualScene(ObjModel *model, std::map<std::string, SceneObject>& scene);
+void BuildTrianglesAndAddToVirtualScene(ObjModel *model, std::map<std::string, SceneObject>& scene, const std::string& prefix = "");
 void ComputeNormals(ObjModel *model);
 
 // Drawing functions

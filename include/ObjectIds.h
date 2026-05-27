@@ -21,5 +21,9 @@
 #define SPACESHIP_MATERIAL_001   17
 #define BACKGROUND               18
 #define ASTEROID                 19
+#define TIE_FIGHTER              20
+#define TIE_DEFENDER             21
+#define TIE_PHANTOM_HULL         22
+#define TIE_PHANTOM_WINGS        23
 
 #endif // OBJECTIDS_H

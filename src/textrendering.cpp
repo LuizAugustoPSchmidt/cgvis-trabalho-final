@@ -110,14 +110,17 @@ void TextRendering_Init()
     glCheckError();
 
     GLuint textvertexshader_id = glCreateShader(GL_VERTEX_SHADER);
+    glCheckError();
     TextRendering_LoadShader(textvertexshader_source, textvertexshader_id);
     glCheckError();
 
     GLuint textfragmentshader_id = glCreateShader(GL_FRAGMENT_SHADER);
+    glCheckError();
     TextRendering_LoadShader(textfragmentshader_source, textfragmentshader_id);
     glCheckError();
 
     textprogram_id = CreateGpuProgram(textvertexshader_id, textfragmentshader_id);
+    glCheckError();
     glLinkProgram(textprogram_id);
     glCheckError();
 

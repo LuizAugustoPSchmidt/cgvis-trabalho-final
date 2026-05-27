@@ -6,10 +6,12 @@
 #include <GLFW/glfw3.h>
 
 #include "Asteroid.h"
-#include "Opponent.h"
 #include "Player.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "TieDefender.h"
+#include "TieFighter.h"
+#include "TiePhantom.h"
 #include "VertexArray.h"
 #include "scene.h"
 #include <glm/mat4x4.hpp>
@@ -31,7 +33,10 @@ public:
   void Shutdown();
 
   void DrawObject(
-      const char *name, int id, const glm::mat4 &model, bool flip_normals = false
+      const char *name,
+      int id,
+      const glm::mat4 &model,
+      bool flip_normals = false
   );
 
   // Callbacks
@@ -75,7 +80,9 @@ private:
   // Game Objects
   std::unique_ptr<Player> m_Player;
   std::vector<std::unique_ptr<Asteroid>> m_Asteroids;
-  std::vector<std::unique_ptr<Opponent>> m_Opponents;
+  std::vector<std::unique_ptr<TieFighter>> m_TieFighters;
+  std::vector<std::unique_ptr<TieDefender>> m_TieDefenders;
+  std::vector<std::unique_ptr<TiePhantom>> m_TiePhantoms;
 
   // Other State
   bool m_ShowInfoText = true;
@@ -100,6 +107,6 @@ private:
   void TextRendering_ShowProjection();
   void TextRendering_ShowFramesPerSecond();
 
-  void LoadModel(const char *path);
+  void LoadModel(const char *path, const std::string& prefix = "");
 };
 #endif // APPLICATION_H
