@@ -72,6 +72,9 @@ add_executable(${EXECUTABLE_NAME} ${SOURCES})
 
 target_include_directories(${EXECUTABLE_NAME} BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
+# Add RELEASE macro for Release builds
+target_compile_definitions(${EXECUTABLE_NAME} PRIVATE $<$<CONFIG:Release>:RELEASE>)
+
 if(WIN32)
 
   if(MINGW)

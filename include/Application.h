@@ -86,7 +86,6 @@ private:
 
   // Other State
   bool m_ShowInfoText = true;
-  float m_AsteroidCurveAngle = 0.0f;
   float m_ForearmAngleZ = 0.0f;
   float m_ForearmAngleX = 0.0f;
   float m_TorsoPositionX = 0.0f;

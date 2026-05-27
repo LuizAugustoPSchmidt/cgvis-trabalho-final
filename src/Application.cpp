@@ -61,6 +61,7 @@ bool Application::Init() {
 }
 
 void Application::LoadAssets(int argc, char *argv[]) {
+#if RELEASE
   const char *backgrounds[] = {
       "../../data/background/background-texture.jpg",
       "../../data/background/background-texture-2k.jpg"};
@@ -69,6 +70,10 @@ void Application::LoadAssets(int argc, char *argv[]) {
   const int random_bg_index = random % 2;
   printf("random bg index %d\n", random);
 
+  const char *bg = backgrounds[random_bg_index];
+#else
+  const char *bg = "../../data/background/bg-white.jpg";
+#endif
   m_MainShader = std::make_unique<Shader>(
       "../../src/shader_vertex.glsl", "../../src/shader_fragment.glsl"
   );
@@ -93,12 +98,7 @@ void Application::LoadAssets(int argc, char *argv[]) {
       )
   );
 
-  // m_Textures.push_back(
-  //     std::make_unique<Texture>(backgrounds[random_bg_index], 2)
-  // );
-  m_Textures.push_back(
-      std::make_unique<Texture>("../../data/background/bg-white.jpg", 2)
-  );
+  m_Textures.push_back(std::make_unique<Texture>(bg, 2));
 
   m_Textures.back()->SetWrapping(GL_MIRRORED_REPEAT);
 
@@ -166,6 +166,7 @@ void Application::LoadAssets(int argc, char *argv[]) {
       )
   );
 
+  // For debug: render ships around the player's x-wing
   float radius = 20.0f;
   int totalShips = 7;
   for (int i = 0; i < totalShips; ++i) {

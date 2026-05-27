@@ -27,22 +27,15 @@ static glm::vec4 CubicBezier(
          (t * t * t) * p3;
 }
 
-static glm::vec4 CubicBezier(
-    const glm::vec4 &p0,
-    const glm::vec4 &p1,
-    const glm::vec4 &p2,
-    const glm::vec4 &p3,
-    float t
-);
-
 Asteroid::Asteroid(glm::vec4 position, glm::vec4 scale, glm::mat4 rotation)
     : GameObject("rock.001_rock.013", ASTEROID), m_Position(position),
       m_Scale(scale), m_Rotation(rotation) {}
 
 void Asteroid::Update(float deltaTime) {
+  m_CurveAngle += ASTEROID_CURVE_SPEED * deltaTime;
   float asteroidCurveTime =
       ASTEROID_CURVE_T_AMPLITUDE *
-      (sin(m_AsteroidCurveAngle - HALF_PI) + ASTEROID_CURVE_T_OFFSET);
+      (sin(m_CurveAngle - HALF_PI) + ASTEROID_CURVE_T_OFFSET);
   glm::vec4 asteroidPosition = CubicBezier(
       ASTEROID_CURVE_P0,
       ASTEROID_CURVE_P1,
@@ -50,14 +43,13 @@ void Asteroid::Update(float deltaTime) {
       ASTEROID_CURVE_P3,
       asteroidCurveTime
   );
-  model = Matrix_Translate(
-              asteroidPosition.x, asteroidPosition.y, asteroidPosition.z
-          ) *
-          Matrix_Rotate_Y(m_AsteroidCurveAngle);
+  m_ModelMatrix =
+      Matrix_Translate(
+          asteroidPosition.x, asteroidPosition.y, asteroidPosition.z
+      ) *
+      Matrix_Rotate_Y(m_CurveAngle);
 }
 
 void Asteroid::Render(Application &app) {
-  glm::mat4 model = Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
-                    m_Rotation * Matrix_Scale(m_Scale.x, m_Scale.y, m_Scale.z);
-  app.DrawObject(m_ModelName.c_str(), m_ObjectId, model);
+  app.DrawObject(m_ModelName.c_str(), m_ObjectId, m_ModelMatrix);
 }

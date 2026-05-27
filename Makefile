@@ -1,10 +1,16 @@
-./bin/Linux/main: src/* include/* CMakeLists.txt CMakePresets.json
-	cmake --preset default-config
-	cmake --build --preset default-build
+all: debug
 
-.PHONY: clean run
+debug:
+	cmake --preset debug
+	cmake --build --preset debug
+
+release:
+	cmake --preset release
+	cmake --build --preset release
+
+.PHONY: clean run release debug all
 clean:
-	rm -f bin/Linux/main
+	rm -rf build bin/Linux/main
 
-run: ./bin/Linux/main
+run:
 	cd bin/Linux && ./main
