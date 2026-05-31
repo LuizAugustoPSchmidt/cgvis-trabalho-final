@@ -420,15 +420,18 @@ void Application::CursorPosCallback(double xpos, double ypos) {
     float dy = ypos - m_LastCursorPosY;
 
     m_CameraTheta -= 0.01f * dx;
-    m_CameraPhi += 0.01f * dy;
 
-    float phimax = 3.141592f / 2;
-    float phimin = -phimax;
+    if (m_CameraMode == CameraMode::ThirdPerson) {
+      m_CameraPhi += 0.01f * dy;
 
-    if (m_CameraPhi > phimax)
-      m_CameraPhi = phimax;
-    if (m_CameraPhi < phimin)
-      m_CameraPhi = phimin;
+      float phimax = 3.141592f / 2;
+      float phimin = -phimax;
+
+      if (m_CameraPhi > phimax)
+        m_CameraPhi = phimax;
+      if (m_CameraPhi < phimin)
+        m_CameraPhi = phimin;
+    }
 
     m_LastCursorPosX = xpos;
     m_LastCursorPosY = ypos;
