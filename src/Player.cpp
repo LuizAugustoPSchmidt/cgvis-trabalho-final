@@ -37,14 +37,27 @@ Player::Player()
 }
 
 void Player::Update(float deltaTime) {
-  m_Forward =
-      glm::vec4(-sin(m_RotationAngle), 0.0f, -cos(m_RotationAngle), 0.0f);
+  m_Forward = glm::vec4(
+      -sin(m_Theta) * cos(m_Phi),
+      sin(m_Phi),
+      -cos(m_Theta) * cos(m_Phi),
+      0.0f
+  );
+  m_Up = glm::vec4(
+      sin(m_Theta) * sin(m_Phi),
+      cos(m_Phi),
+      cos(m_Theta) * sin(m_Phi),
+      0.0f
+  );
+  m_Position += m_Forward * m_Speed * deltaTime;
 }
 
 void Player::Render(Application &app) {
   glm::mat4 model =
       Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
-      Matrix_Rotate_Y(m_RotationAngle) * Matrix_Scale(0.1f, 0.1f, 0.1f);
+      Matrix_Rotate_Y(m_Theta) *
+      Matrix_Rotate_X(m_Phi) *
+      Matrix_Scale(0.1f, 0.1f, 0.1f);
 
   for (const auto &part : m_Parts) {
     if (part.flip_normals) {

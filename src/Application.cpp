@@ -214,7 +214,8 @@ void Application::Run() {
 }
 
 void Application::Update(float deltaTime) {
-  m_Player->SetRotation(m_CameraTheta);
+  m_Player->SetTheta(m_CameraTheta);
+  m_Player->SetPhi(m_CameraPhi);
   m_Player->Update(deltaTime);
   for (auto &asteroid : m_Asteroids)
     asteroid->Update(deltaTime);
@@ -232,13 +233,10 @@ void Application::Update(float deltaTime) {
   }
 
   if (m_CameraMode == CameraMode::ThirdPerson) {
-    // TPV: Camera orbits the spaceship based on mouse drag
+    // TPV: Camera follows behind the ship
     float r = m_CameraDistance;
-    float y = r * sin(m_CameraPhi);
-    float z = r * cos(m_CameraPhi) * cos(m_CameraTheta);
-    float x = r * cos(m_CameraPhi) * sin(m_CameraTheta);
-
-    m_CameraPosition = m_Player->GetPosition() + glm::vec4(x, y, z, 0.0f);
+    m_CameraPosition = m_Player->GetPosition() - m_Player->GetForward() * r +
+                       m_Player->GetUp() * (r * 0.3f);
     m_CameraLookAt = m_Player->GetPosition();
     m_CameraUp = m_Player->GetUp();
   } else {
@@ -421,17 +419,15 @@ void Application::CursorPosCallback(double xpos, double ypos) {
 
     m_CameraTheta -= 0.01f * dx;
 
-    if (m_CameraMode == CameraMode::ThirdPerson) {
-      m_CameraPhi += 0.01f * dy;
+    m_CameraPhi += 0.01f * dy;
 
-      float phimax = 3.141592f / 2;
-      float phimin = -phimax;
+    float phimax = 3.141592f / 2;
+    float phimin = -phimax;
 
-      if (m_CameraPhi > phimax)
-        m_CameraPhi = phimax;
-      if (m_CameraPhi < phimin)
-        m_CameraPhi = phimin;
-    }
+    if (m_CameraPhi > phimax)
+      m_CameraPhi = phimax;
+    if (m_CameraPhi < phimin)
+      m_CameraPhi = phimin;
 
     m_LastCursorPosX = xpos;
     m_LastCursorPosY = ypos;
