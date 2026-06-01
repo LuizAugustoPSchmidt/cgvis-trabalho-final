@@ -32,7 +32,7 @@ Asteroid::Asteroid(glm::vec4 position, glm::vec4 scale, glm::mat4 rotation)
       m_Scale(scale), m_Rotation(rotation) {}
 
 void Asteroid::Update(float deltaTime) {
-  m_CurveAngle += ASTEROID_CURVE_SPEED * deltaTime;
+  m_CurveAngle += ASTEROID_CURVE_SPEED * m_Direction * deltaTime;
   float asteroidCurveTime =
       ASTEROID_CURVE_T_AMPLITUDE *
       (sin(m_CurveAngle - HALF_PI) + ASTEROID_CURVE_T_OFFSET);

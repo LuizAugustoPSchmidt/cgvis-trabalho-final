@@ -16,12 +16,14 @@ public:
   float GetCurveAngle() const { return m_CurveAngle; }
   glm::vec4 GetPosition() const { return m_Position; }
   float GetRadius() const { return 2.0f; }
+  void ReverseDirection() { m_Direction = -m_Direction; }
 
 private:
   glm::vec4 m_Position;
   glm::vec4 m_Scale;
   glm::mat4 m_Rotation;
   float m_CurveAngle = 0.0f;
+  float m_Direction = 1.0f;
   glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 };
 

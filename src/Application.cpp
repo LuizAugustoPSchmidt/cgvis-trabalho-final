@@ -555,6 +555,15 @@ void Application::CheckCollisions() {
   removeCollidingShips(m_TieFighters);
   removeCollidingShips(m_TieDefenders);
   removeCollidingShips(m_TiePhantoms);
+
+  // Asteroid vs asteroid -> reverse both directions
+  for (size_t i = 0; i < m_Asteroids.size(); ++i)
+    for (size_t j = i + 1; j < m_Asteroids.size(); ++j)
+      if (SphereSphere(m_Asteroids[i]->GetPosition(), m_Asteroids[i]->GetRadius(),
+                       m_Asteroids[j]->GetPosition(), m_Asteroids[j]->GetRadius())) {
+        m_Asteroids[i]->ReverseDirection();
+        m_Asteroids[j]->ReverseDirection();
+      }
 }
 
 void Application::TextRendering_ShowGameOver() {
