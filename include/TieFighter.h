@@ -14,6 +14,8 @@ public:
   virtual void Render(Application &app) override;
 
   void SetTarget(glm::vec4 target) { m_Target = target; }
+  glm::vec4 GetPosition() const { return m_Position; }
+  float GetRadius() const { return 1.0f; }
 
 private:
   glm::vec4 m_Position;

@@ -14,6 +14,8 @@ public:
   virtual void Render(Application &app) override;
 
   float GetCurveAngle() const { return m_CurveAngle; }
+  glm::vec4 GetPosition() const { return m_Position; }
+  float GetRadius() const { return 2.0f; }
 
 private:
   glm::vec4 m_Position;

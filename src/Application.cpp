@@ -4,6 +4,7 @@
 #include "opengl_utils.h"
 #include "scene.h"
 // #include "utils.h"
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -232,6 +233,9 @@ void Application::Update(float deltaTime) {
     ship->Update(deltaTime);
   }
 
+  if (!m_GameOver)
+    CheckCollisions();
+
   if (m_CameraMode == CameraMode::ThirdPerson) {
     // TPV: Camera follows behind the ship
     float r = m_CameraDistance;
@@ -304,6 +308,7 @@ void Application::Render() {
     ship->Render(*this);
 
   TextRendering_ShowFramesPerSecond();
+  TextRendering_ShowGameOver();
 }
 
 void Application::DrawObject(
@@ -462,4 +467,109 @@ void Application::ScrollCallback(double xoffset, double yoffset) {
 void Application::FramebufferSizeCallback(int width, int height) {
   glViewport(0, 0, width, height);
   m_ScreenRatio = (float)width / height;
+}
+
+static bool SphereSphere(glm::vec4 posA, float rA, glm::vec4 posB, float rB) {
+  glm::vec4 d = posA - posB;
+  float dist2 = d.x * d.x + d.y * d.y + d.z * d.z;
+  float rSum = rA + rB;
+  return dist2 < rSum * rSum;
+}
+
+void Application::CheckCollisions() {
+  glm::vec4 playerPos = m_Player->GetPosition();
+  float playerRadius = m_Player->GetRadius();
+
+  // Player vs asteroids
+  for (const auto &asteroid : m_Asteroids) {
+    if (SphereSphere(playerPos, playerRadius, asteroid->GetPosition(), asteroid->GetRadius())) {
+      m_GameOver = true;
+      return;
+    }
+  }
+
+  // Player vs enemy ships
+  for (const auto &ship : m_TieFighters) {
+    if (SphereSphere(playerPos, playerRadius, ship->GetPosition(), ship->GetRadius())) {
+      m_GameOver = true;
+      return;
+    }
+  }
+  for (const auto &ship : m_TieDefenders) {
+    if (SphereSphere(playerPos, playerRadius, ship->GetPosition(), ship->GetRadius())) {
+      m_GameOver = true;
+      return;
+    }
+  }
+  for (const auto &ship : m_TiePhantoms) {
+    if (SphereSphere(playerPos, playerRadius, ship->GetPosition(), ship->GetRadius())) {
+      m_GameOver = true;
+      return;
+    }
+  }
+
+  // Enemy ships vs asteroids -> remove ship
+  auto shipHitsAsteroid = [&](glm::vec4 pos, float r) {
+    for (const auto &asteroid : m_Asteroids)
+      if (SphereSphere(pos, r, asteroid->GetPosition(), asteroid->GetRadius()))
+        return true;
+    return false;
+  };
+
+  m_TieFighters.erase(
+      std::remove_if(m_TieFighters.begin(), m_TieFighters.end(),
+          [&](const std::unique_ptr<TieFighter> &s) {
+            return shipHitsAsteroid(s->GetPosition(), s->GetRadius());
+          }),
+      m_TieFighters.end());
+
+  m_TieDefenders.erase(
+      std::remove_if(m_TieDefenders.begin(), m_TieDefenders.end(),
+          [&](const std::unique_ptr<TieDefender> &s) {
+            return shipHitsAsteroid(s->GetPosition(), s->GetRadius());
+          }),
+      m_TieDefenders.end());
+
+  m_TiePhantoms.erase(
+      std::remove_if(m_TiePhantoms.begin(), m_TiePhantoms.end(),
+          [&](const std::unique_ptr<TiePhantom> &s) {
+            return shipHitsAsteroid(s->GetPosition(), s->GetRadius());
+          }),
+      m_TiePhantoms.end());
+
+  // Enemy ships vs enemy ships -> remove both
+  auto removeCollidingShips = [&](auto &ships) {
+    std::vector<size_t> toRemove;
+    for (size_t i = 0; i < ships.size(); ++i)
+      for (size_t j = i + 1; j < ships.size(); ++j)
+        if (SphereSphere(ships[i]->GetPosition(), ships[i]->GetRadius(),
+                         ships[j]->GetPosition(), ships[j]->GetRadius())) {
+          toRemove.push_back(i);
+          toRemove.push_back(j);
+        }
+    for (size_t i = ships.size(); i-- > 0;)
+      if (std::find(toRemove.begin(), toRemove.end(), i) != toRemove.end())
+        ships.erase(ships.begin() + i);
+  };
+
+  removeCollidingShips(m_TieFighters);
+  removeCollidingShips(m_TieDefenders);
+  removeCollidingShips(m_TiePhantoms);
+}
+
+void Application::TextRendering_ShowGameOver() {
+  if (!m_GameOver)
+    return;
+
+  const char *msg = "GAME OVER";
+  int numchars = 9;
+  float lineheight = TextRendering_LineHeight(m_Window);
+  float charwidth = TextRendering_CharWidth(m_Window);
+
+  float x = -(numchars / 2.0f) * charwidth * 2.0f;
+  float y = 0.0f;
+
+  TextRendering_PrintString(
+      m_Window, msg, x, y, 2.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f)
+  );
 }

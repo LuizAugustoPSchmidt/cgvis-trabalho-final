@@ -23,6 +23,7 @@ public:
   glm::vec4 GetPosition() const { return m_Position; }
   glm::vec4 GetForward() const { return m_Forward; }
   glm::vec4 GetUp() const { return m_Up; }
+  float GetRadius() const { return 0.8f; }
 
   void SetPosition(glm::vec4 pos) { m_Position = pos; }
   void SetTheta(float angle) { m_Theta = angle; }

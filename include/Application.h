@@ -84,6 +84,9 @@ private:
   std::vector<std::unique_ptr<TieDefender>> m_TieDefenders;
   std::vector<std::unique_ptr<TiePhantom>> m_TiePhantoms;
 
+  // Game State
+  bool m_GameOver = false;
+
   // Other State
   bool m_ShowInfoText = true;
   bool m_VsyncEnabled = true;
@@ -104,11 +107,13 @@ private:
 
   void Update(float deltaTime);
   void Render();
+  void CheckCollisions();
 
   // UI Helpers
   void TextRendering_ShowEulerAngles();
   void TextRendering_ShowProjection();
   void TextRendering_ShowFramesPerSecond();
+  void TextRendering_ShowGameOver();
 
   void LoadModel(const char *path, const std::string& prefix = "");
 };

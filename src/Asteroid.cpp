@@ -43,6 +43,7 @@ void Asteroid::Update(float deltaTime) {
       ASTEROID_CURVE_P3,
       asteroidCurveTime
   );
+  m_Position = asteroidPosition;
   m_ModelMatrix =
       Matrix_Translate(
           asteroidPosition.x, asteroidPosition.y, asteroidPosition.z
