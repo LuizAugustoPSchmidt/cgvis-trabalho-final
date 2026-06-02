@@ -377,6 +377,12 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
     m_CameraMode = (m_CameraMode == CameraMode::ThirdPerson)
                        ? CameraMode::FirstPerson
                        : CameraMode::ThirdPerson;
+  if (key == GLFW_KEY_I && action == GLFW_PRESS) {
+    m_InvertY = !m_InvertY;
+#if !RELEASE
+    printf("Mouse Y Inversion: %s\n", m_InvertY ? "ON (Flight)" : "OFF (Normal)");
+#endif
+  }
   if (key == GLFW_KEY_V && action == GLFW_PRESS) {
     m_VsyncEnabled = !m_VsyncEnabled;
     glfwSwapInterval(m_VsyncEnabled ? 1 : 0);
@@ -424,7 +430,7 @@ void Application::CursorPosCallback(double xpos, double ypos) {
 
     m_CameraTheta -= 0.01f * dx;
 
-    m_CameraPhi += 0.01f * dy;
+    m_CameraPhi += 0.01f * (m_InvertY ? dy : -dy);
 
     float phimax = 3.141592f / 2;
     float phimin = -phimax;

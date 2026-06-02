@@ -61,6 +61,7 @@ private:
   bool m_LeftMouseButtonPressed = false;
   bool m_RightMouseButtonPressed = false;
   bool m_MiddleMouseButtonPressed = false;
+  bool m_InvertY = true;
   double m_LastCursorPosX = 0.0, m_LastCursorPosY = 0.0;
 
   // Camera State
