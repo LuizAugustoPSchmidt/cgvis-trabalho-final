@@ -33,9 +33,11 @@ Asteroid::Asteroid(glm::vec4 position, glm::vec4 scale, glm::mat4 rotation)
 
 void Asteroid::Update(float deltaTime) {
   m_CurveAngle += ASTEROID_CURVE_SPEED * m_Direction * deltaTime;
+
   float asteroidCurveTime =
       ASTEROID_CURVE_T_AMPLITUDE *
       (sin(m_CurveAngle - HALF_PI) + ASTEROID_CURVE_T_OFFSET);
+
   glm::vec4 asteroidPosition = CubicBezier(
       ASTEROID_CURVE_P0,
       ASTEROID_CURVE_P1,
@@ -43,12 +45,12 @@ void Asteroid::Update(float deltaTime) {
       ASTEROID_CURVE_P3,
       asteroidCurveTime
   );
+
   m_Position = asteroidPosition;
-  m_ModelMatrix =
-      Matrix_Translate(
-          asteroidPosition.x, asteroidPosition.y, asteroidPosition.z
-      ) *
-      Matrix_Rotate_Y(m_CurveAngle);
+  m_ModelMatrix = Matrix_Translate(
+                      asteroidPosition.x, asteroidPosition.y, asteroidPosition.z
+                  ) *
+                  Matrix_Rotate_Y(m_CurveAngle);
 }
 
 void Asteroid::Render(Application &app) {

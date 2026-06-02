@@ -43,6 +43,9 @@ uniform mat4 projection;
 #define TIE_DEFENDER             21
 #define TIE_PHANTOM_HULL         22
 #define TIE_PHANTOM_WINGS        23
+#define DEBUG_VECTOR_RED         100
+#define DEBUG_VECTOR_GREEN       101
+#define DEBUG_VECTOR_BLUE        102
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -214,11 +217,25 @@ void main()
         V = texcoords.y;
         Kd0 = texture(TextureImage7, vec2(U,V)).rgb;
     }
+    else if ( object_id == DEBUG_VECTOR_RED )
+    {
+        Kd0 = vec3(1.0, 0.0, 0.0);
+    }
+    else if ( object_id == DEBUG_VECTOR_GREEN )
+    {
+        Kd0 = vec3(0.0, 1.0, 0.0);
+    }
+    else if ( object_id == DEBUG_VECTOR_BLUE )
+    {
+        Kd0 = vec3(0.0, 0.0, 1.0);
+    }
 
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
 
     if (object_id == BACKGROUND)
+        color.rgb = Kd0;
+    else if (object_id >= 100) // Debug vectors are unlit
         color.rgb = Kd0;
     else
         color.rgb = Kd0 * (lambert + 0.01);

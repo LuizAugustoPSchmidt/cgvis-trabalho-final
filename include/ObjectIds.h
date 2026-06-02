@@ -25,5 +25,8 @@
 #define TIE_DEFENDER             21
 #define TIE_PHANTOM_HULL         22
 #define TIE_PHANTOM_WINGS        23
+#define DEBUG_VECTOR_RED         100
+#define DEBUG_VECTOR_GREEN       101
+#define DEBUG_VECTOR_BLUE        102
 
 #endif // OBJECTIDS_H

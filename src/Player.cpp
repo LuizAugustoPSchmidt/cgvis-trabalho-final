@@ -37,6 +37,11 @@ Player::Player()
 }
 
 void Player::Update(float deltaTime) {
+  UpdateOrientation();
+  m_Position += m_Forward * m_Speed * deltaTime;
+}
+
+void Player::UpdateOrientation() {
   m_Forward = glm::vec4(
       -sin(m_Theta) * cos(m_Phi),
       sin(m_Phi),
@@ -49,7 +54,6 @@ void Player::Update(float deltaTime) {
       cos(m_Theta) * sin(m_Phi),
       0.0f
   );
-  m_Position += m_Forward * m_Speed * deltaTime;
 }
 
 void Player::Render(Application &app) {

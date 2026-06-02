@@ -39,6 +39,8 @@ public:
       bool flip_normals = false
   );
 
+  void DrawLine(glm::vec4 from, glm::vec4 to, int color_id);
+
   // Callbacks
   void KeyCallback(int key, int scancode, int action, int mod);
   void MouseButtonCallback(int button, int action, int mods);
@@ -87,6 +89,7 @@ private:
 
   // Game State
   bool m_GameOver = false;
+  bool m_Paused = false;
 
   // Other State
   bool m_ShowInfoText = true;
@@ -101,6 +104,7 @@ private:
 
   // OpenGL Resources (RAII)
   std::unique_ptr<Shader> m_MainShader;
+  GLuint m_LineVAO = 0;
   std::vector<std::unique_ptr<Texture>> m_Textures;
   std::vector<std::unique_ptr<VertexArray>> m_VertexArrays;
   std::vector<std::unique_ptr<VertexBuffer>> m_VertexBuffers;

@@ -18,6 +18,7 @@ public:
   virtual ~Player() = default;
 
   virtual void Update(float deltaTime) override;
+  void UpdateOrientation();
   virtual void Render(Application &app) override;
 
   glm::vec4 GetPosition() const { return m_Position; }

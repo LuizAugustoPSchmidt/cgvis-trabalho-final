@@ -217,24 +217,28 @@ void Application::Run() {
 void Application::Update(float deltaTime) {
   m_Player->SetTheta(m_CameraTheta);
   m_Player->SetPhi(m_CameraPhi);
-  m_Player->Update(deltaTime);
-  for (auto &asteroid : m_Asteroids)
-    asteroid->Update(deltaTime);
-  for (auto &ship : m_TieFighters) {
-    ship->SetTarget(m_Player->GetPosition());
-    ship->Update(deltaTime);
-  }
-  for (auto &ship : m_TieDefenders) {
-    ship->SetTarget(m_Player->GetPosition());
-    ship->Update(deltaTime);
-  }
-  for (auto &ship : m_TiePhantoms) {
-    ship->SetTarget(m_Player->GetPosition());
-    ship->Update(deltaTime);
-  }
+  m_Player->UpdateOrientation();
 
-  if (!m_GameOver)
-    CheckCollisions();
+  if (!m_Paused) {
+    m_Player->Update(deltaTime);
+    for (auto &asteroid : m_Asteroids)
+      asteroid->Update(deltaTime);
+    for (auto &ship : m_TieFighters) {
+      ship->SetTarget(m_Player->GetPosition());
+      ship->Update(deltaTime);
+    }
+    for (auto &ship : m_TieDefenders) {
+      ship->SetTarget(m_Player->GetPosition());
+      ship->Update(deltaTime);
+    }
+    for (auto &ship : m_TiePhantoms) {
+      ship->SetTarget(m_Player->GetPosition());
+      ship->Update(deltaTime);
+    }
+
+    if (!m_GameOver)
+      CheckCollisions();
+  }
 
   if (m_CameraMode == CameraMode::ThirdPerson) {
     // TPV: Camera follows behind the ship
@@ -266,7 +270,7 @@ void Application::Render() {
 
   glm::mat4 projection;
   float nearplane = -0.01f; // Closer nearplane for FPV cockpit visibility
-  float farplane = -100.0f; // Increased far plane for space
+  float farplane = -2000.0f; // Increased far plane for space
 
   if (m_UsePerspectiveProjection) {
     float field_of_view = 3.141592 / 3.0f;
@@ -288,12 +292,14 @@ void Application::Render() {
 
   // Background skybox
   glDisable(GL_CULL_FACE);
+  glDepthMask(GL_FALSE);
   glm::mat4 model =
       Matrix_Translate(
           m_CameraPosition.x, m_CameraPosition.y, m_CameraPosition.z
       ) *
-      Matrix_Scale(50.0f, 50.0f, 50.0f);
+      Matrix_Scale(1000.0f, 1000.0f, 1000.0f);
   DrawObject("the_sphere", BACKGROUND, model, false);
+  glDepthMask(GL_TRUE);
   glEnable(GL_CULL_FACE);
 
   // Render Game Objects
@@ -321,6 +327,24 @@ void Application::DrawObject(
   m_MainShader->SetInt("object_id", id);
   m_MainShader->SetBool("flip_normals", flip_normals);
   DrawVirtualObject(name, m_VirtualScene, bbox_min_uniform, bbox_max_uniform);
+}
+
+void Application::DrawLine(glm::vec4 from, glm::vec4 to, int color_id) {
+  glm::vec4 direction = to - from;
+  float length = norm(direction);
+  if (length < 0.01f)
+    return;
+
+  // Matrix_Look_At aligns +Z with (to - from)
+  // We scale Z by length and X,Y by a small value for thickness.
+  // We use the_sphere as our geometry for the line.
+  glm::mat4 model = Matrix_Translate(from.x, from.y, from.z) *
+                    Matrix_Look_At(
+                        from, to, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)
+                    ) *
+                    Matrix_Scale(0.1f, 0.1f, length);
+
+  DrawObject("the_sphere", color_id, model);
 }
 
 void Application::TextRendering_ShowFramesPerSecond() {
@@ -382,6 +406,10 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
 #if !RELEASE
     printf("Mouse Y Inversion: %s\n", m_InvertY ? "ON (Flight)" : "OFF (Normal)");
 #endif
+  }
+  if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+    m_Paused = !m_Paused;
+    printf("Game %s\n", m_Paused ? "PAUSED" : "RESUMED");
   }
   if (key == GLFW_KEY_V && action == GLFW_PRESS) {
     m_VsyncEnabled = !m_VsyncEnabled;
