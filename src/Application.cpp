@@ -401,6 +401,12 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
     m_CameraMode = (m_CameraMode == CameraMode::ThirdPerson)
                        ? CameraMode::FirstPerson
                        : CameraMode::ThirdPerson;
+  if (key == GLFW_KEY_W) {
+    if (action == GLFW_PRESS)
+      m_Player->SetBoosting(true);
+    else if (action == GLFW_RELEASE)
+      m_Player->SetBoosting(false);
+  }
   if (key == GLFW_KEY_I && action == GLFW_PRESS) {
     m_InvertY = !m_InvertY;
 #if !RELEASE

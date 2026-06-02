@@ -4,11 +4,17 @@
 #include "matrices.h"
 #include <glad/glad.h>
 
+constexpr float NORMAL_SPEED = 15.0f;
+constexpr float MAX_BOOST_SPEED = 45.0f;
+constexpr float BOOST_ACCEL = 30.0f;
+constexpr float BOOST_DECEL = 20.0f;
+
 Player::Player()
     : GameObject("spaceship", SPACESHIP_MATERIAL),
       m_Position(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
       m_Forward(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)),
-      m_Up(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)) {
+      m_Up(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)),
+      m_Speed(NORMAL_SPEED) {
   m_Parts = {
       {"Cube", SPACESHIP_MATERIAL, true},
       {"Cube_motor_0", SPACESHIP_MOTOR, false},
@@ -38,6 +44,19 @@ Player::Player()
 
 void Player::Update(float deltaTime) {
   UpdateOrientation();
+
+  float targetSpeed = m_IsBoosting ? MAX_BOOST_SPEED : NORMAL_SPEED;
+
+  if (m_Speed < targetSpeed) {
+    m_Speed += BOOST_ACCEL * deltaTime;
+    if (m_Speed > targetSpeed)
+      m_Speed = targetSpeed;
+  } else if (m_Speed > targetSpeed) {
+    m_Speed -= BOOST_DECEL * deltaTime;
+    if (m_Speed < targetSpeed)
+      m_Speed = targetSpeed;
+  }
+
   m_Position += m_Forward * m_Speed * deltaTime;
 }
 

@@ -29,11 +29,13 @@ public:
   void SetPosition(glm::vec4 pos) { m_Position = pos; }
   void SetTheta(float angle) { m_Theta = angle; }
   void SetPhi(float phi) { m_Phi = phi; }
+  void SetBoosting(bool boosting) { m_IsBoosting = boosting; }
 
 private:
   float m_Theta = 0.0f;
   float m_Phi = 0.0f;
-  static constexpr float m_Speed = 5.0f;
+  float m_Speed = 5.0f;
+  bool m_IsBoosting = false;
   glm::vec4 m_Position;
   glm::vec4 m_Forward;
   glm::vec4 m_Up;
