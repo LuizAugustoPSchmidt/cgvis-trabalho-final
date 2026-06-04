@@ -18,3 +18,7 @@
 - [ ] Iluminação
 - [x] Curva de Bezier
 - [x] Colisões
+
+## Inteligência Artificial
+
+- [ ] Implementar lógica de desvio para os TIEs para que não colidam entre si enquanto perseguem o jogador.

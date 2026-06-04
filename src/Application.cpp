@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 // #include <iostream>
 
 // External function for automated correction
@@ -78,7 +79,8 @@ void Application::LoadAssets(int argc, char *argv[]) {
   const char *bg = "../../data/background/bg-white.jpg";
 #endif
   m_MainShader = std::make_unique<Shader>(
-      "../../src/shader_vertex.glsl", "../../src/shader_fragment.glsl"
+      "../../src/shader_vertex.glsl",
+      "../../src/shader_fragment.glsl"
   );
 
   m_MainShader->Use();
@@ -97,7 +99,8 @@ void Application::LoadAssets(int argc, char *argv[]) {
 
   m_Textures.push_back(
       std::make_unique<Texture>(
-          "../../data/asteroid/asteroid-texture-alt.jpg", 1
+          "../../data/asteroid/asteroid-texture-alt.jpg",
+          1
       )
   );
 
@@ -111,27 +114,31 @@ void Application::LoadAssets(int argc, char *argv[]) {
 
   m_Textures.push_back(
       std::make_unique<Texture>(
-          "../../data/tie-fighter/tie-fighter-texture.png", 4
+          "../../data/tie-fighter/tie-fighter-texture.png",
+          4
       )
   );
   m_Textures.back()->SetWrapping(GL_REPEAT);
 
   m_Textures.push_back(
       std::make_unique<Texture>(
-          "../../data/tie-defender/tie-defender-texture.png", 5
+          "../../data/tie-defender/tie-defender-texture.png",
+          5
       )
   );
   m_Textures.back()->SetWrapping(GL_REPEAT);
   m_Textures.push_back(
       std::make_unique<Texture>(
-          "../../data/tie-phantom/tie-phantom-texture.jpeg", 6
+          "../../data/tie-phantom/tie-phantom-texture.jpeg",
+          6
       )
   );
   m_Textures.back()->SetWrapping(GL_REPEAT);
 
   m_Textures.push_back(
       std::make_unique<Texture>(
-          "../../data/tie-phantom/tie-phantom-texture-wings.jpeg", 7
+          "../../data/tie-phantom/tie-phantom-texture-wings.jpeg",
+          7
       )
   );
   m_Textures.back()->SetWrapping(GL_REPEAT);
@@ -169,22 +176,10 @@ void Application::LoadAssets(int argc, char *argv[]) {
       )
   );
 
-  // For debug: render ships around the player's x-wing
-  float radius = 20.0f;
-  int totalShips = 7;
-  for (int i = 0; i < totalShips; ++i) {
-    float angle = i * (2.0f * 3.14159265f / totalShips);
-    glm::vec4 pos =
-        glm::vec4(radius * sin(angle), 0.0f, radius * cos(angle), 1.0f);
-
-    if (i < 3) {
-      m_TieFighters.push_back(std::make_unique<TieFighter>(pos));
-    } else if (i < 5) {
-      m_TieDefenders.push_back(std::make_unique<TieDefender>(pos));
-    } else {
-      m_TiePhantoms.push_back(std::make_unique<TiePhantom>(pos));
-    }
-  }
+  // Spawn TIE Squadrons
+  SpawnSquadrons(6, 12, 100.0f, m_TieFighters); // 6 squads of 12 Fighters
+  SpawnSquadrons(3, 6, 150.0f, m_TiePhantoms);  // 3 squads of 6 Phantoms
+  SpawnSquadrons(2, 3, 200.0f, m_TieDefenders); // 2 squads of 3 Defenders
 
   if (argc > 1) {
     LoadModel(argv[1]);
@@ -269,7 +264,7 @@ void Application::Render() {
       Matrix_Camera_View(m_CameraPosition, camera_view_vector, m_CameraUp);
 
   glm::mat4 projection;
-  float nearplane = -0.01f; // Closer nearplane for FPV cockpit visibility
+  float nearplane = -0.01f;  // Closer nearplane for FPV cockpit visibility
   float farplane = -2000.0f; // Increased far plane for space
 
   if (m_UsePerspectiveProjection) {
@@ -293,11 +288,12 @@ void Application::Render() {
   // Background skybox
   glDisable(GL_CULL_FACE);
   glDepthMask(GL_FALSE);
-  glm::mat4 model =
-      Matrix_Translate(
-          m_CameraPosition.x, m_CameraPosition.y, m_CameraPosition.z
-      ) *
-      Matrix_Scale(1000.0f, 1000.0f, 1000.0f);
+  glm::mat4 model = Matrix_Translate(
+                        m_CameraPosition.x,
+                        m_CameraPosition.y,
+                        m_CameraPosition.z
+                    ) *
+                    Matrix_Scale(1000.0f, 1000.0f, 1000.0f);
   DrawObject("the_sphere", BACKGROUND, model, false);
   glDepthMask(GL_TRUE);
   glEnable(GL_CULL_FACE);
@@ -313,12 +309,93 @@ void Application::Render() {
   for (auto &ship : m_TiePhantoms)
     ship->Render(*this);
 
+  RenderMinimap();
+
   TextRendering_ShowFramesPerSecond();
   TextRendering_ShowGameOver();
 }
 
+void Application::RenderMinimap() {
+  // 1. Get current window dimensions
+  int width, height;
+  glfwGetFramebufferSize(m_Window, &width, &height);
+
+  // 2. Define Minimap Viewport (Bottom Right)
+  int minimapSize = std::min(width, height) / 4;
+  int margin = 20;
+  glViewport(width - minimapSize - margin, margin, minimapSize, minimapSize);
+
+  // 3. Set up Top-Down Camera
+  glm::vec4 playerPos = m_Player->GetPosition();
+  float zoom = 300.0f; // Radius of world visible in minimap
+  glm::vec4 cameraPos = playerPos + glm::vec4(0.0f, 500.0f, 0.0f, 0.0f);
+  glm::vec4 lookAt = playerPos;
+  glm::vec4 viewUp = glm::vec4(
+      0.0f,
+      0.0f,
+      -1.0f,
+      0.0f
+  ); // Map "Forward" (-Z) to "Up" on screen
+
+  glm::mat4 view = Matrix_Camera_View(cameraPos, lookAt - cameraPos, viewUp);
+  glm::mat4 projection =
+      Matrix_Orthographic(-zoom, zoom, -zoom, zoom, -0.1f, -1000.0f);
+
+  m_MainShader->SetMat4("view", view);
+  m_MainShader->SetMat4("projection", projection);
+
+  // 4. Render Blips
+  glClear(GL_DEPTH_BUFFER_BIT);
+
+  auto drawArrowBlip = [&](glm::vec4 pos,
+                           glm::vec4 forward,
+                           int color,
+                           float size) {
+    // Base dot
+    DrawObject(
+        "the_sphere",
+        color,
+        Matrix_Translate(pos.x, pos.y, pos.z) * Matrix_Scale(size, size, size)
+    );
+    // Orientation line
+    DrawLine(pos, pos + forward * size * 3.0f, color);
+  };
+
+  // Player arrow
+  drawArrowBlip(playerPos, m_Player->GetForward(), DEBUG_VECTOR_GREEN, 10.0f);
+
+  // Enemy arrows
+  for (const auto &ship : m_TieFighters)
+    drawArrowBlip(
+        ship->GetPosition(),
+        ship->GetForward(),
+        DEBUG_VECTOR_RED,
+        5.0f
+    );
+  for (const auto &ship : m_TieDefenders)
+    drawArrowBlip(
+        ship->GetPosition(),
+        ship->GetForward(),
+        DEBUG_VECTOR_RED,
+        5.0f
+    );
+  for (const auto &ship : m_TiePhantoms)
+    drawArrowBlip(
+        ship->GetPosition(),
+        ship->GetForward(),
+        DEBUG_VECTOR_RED,
+        5.0f
+    );
+
+  // 5. Restore Main Viewport
+  glViewport(0, 0, width, height);
+}
+
 void Application::DrawObject(
-    const char *name, int id, const glm::mat4 &model, bool flip_normals
+    const char *name,
+    int id,
+    const glm::mat4 &model,
+    bool flip_normals
 ) {
   GLint bbox_min_uniform = m_MainShader->GetUniformLocation("bbox_min");
   GLint bbox_max_uniform = m_MainShader->GetUniformLocation("bbox_max");
@@ -338,11 +415,10 @@ void Application::DrawLine(glm::vec4 from, glm::vec4 to, int color_id) {
   // Matrix_Look_At aligns +Z with (to - from)
   // We scale Z by length and X,Y by a small value for thickness.
   // We use the_sphere as our geometry for the line.
-  glm::mat4 model = Matrix_Translate(from.x, from.y, from.z) *
-                    Matrix_Look_At(
-                        from, to, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)
-                    ) *
-                    Matrix_Scale(0.1f, 0.1f, length);
+  glm::mat4 model =
+      Matrix_Translate(from.x, from.y, from.z) *
+      Matrix_Look_At(from, to, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)) *
+      Matrix_Scale(0.1f, 0.1f, length);
 
   DrawObject("the_sphere", color_id, model);
 }
@@ -380,7 +456,12 @@ void Application::TextRendering_ShowFramesPerSecond() {
       glm::vec4(0.0f, 0.0f, 0.0f, 0.5f)
   );
   TextRendering_PrintString(
-      m_Window, buffer, x, y, 1.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
+      m_Window,
+      buffer,
+      x,
+      y,
+      1.0f,
+      glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
   );
 }
 
@@ -410,7 +491,10 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
   if (key == GLFW_KEY_I && action == GLFW_PRESS) {
     m_InvertY = !m_InvertY;
 #if !RELEASE
-    printf("Mouse Y Inversion: %s\n", m_InvertY ? "ON (Flight)" : "OFF (Normal)");
+    printf(
+        "Mouse Y Inversion: %s\n",
+        m_InvertY ? "ON (Flight)" : "OFF (Normal)"
+    );
 #endif
   }
   if (key == GLFW_KEY_P && action == GLFW_PRESS) {
@@ -426,7 +510,8 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
     // Shader reload logic could be moved here or kept in opengl_utils
     // For now, let's just re-instantiate our Shader object
     m_MainShader = std::make_unique<Shader>(
-        "../../src/shader_vertex.glsl", "../../src/shader_fragment.glsl"
+        "../../src/shader_vertex.glsl",
+        "../../src/shader_fragment.glsl"
     );
     fprintf(stdout, "Shaders recarregados!\n");
     fflush(stdout);
@@ -522,7 +607,12 @@ void Application::CheckCollisions() {
 
   // Player vs asteroids
   for (const auto &asteroid : m_Asteroids) {
-    if (SphereSphere(playerPos, playerRadius, asteroid->GetPosition(), asteroid->GetRadius())) {
+    if (SphereSphere(
+            playerPos,
+            playerRadius,
+            asteroid->GetPosition(),
+            asteroid->GetRadius()
+        )) {
       m_GameOver = true;
       return;
     }
@@ -530,19 +620,34 @@ void Application::CheckCollisions() {
 
   // Player vs enemy ships
   for (const auto &ship : m_TieFighters) {
-    if (SphereSphere(playerPos, playerRadius, ship->GetPosition(), ship->GetRadius())) {
+    if (SphereSphere(
+            playerPos,
+            playerRadius,
+            ship->GetPosition(),
+            ship->GetRadius()
+        )) {
       m_GameOver = true;
       return;
     }
   }
   for (const auto &ship : m_TieDefenders) {
-    if (SphereSphere(playerPos, playerRadius, ship->GetPosition(), ship->GetRadius())) {
+    if (SphereSphere(
+            playerPos,
+            playerRadius,
+            ship->GetPosition(),
+            ship->GetRadius()
+        )) {
       m_GameOver = true;
       return;
     }
   }
   for (const auto &ship : m_TiePhantoms) {
-    if (SphereSphere(playerPos, playerRadius, ship->GetPosition(), ship->GetRadius())) {
+    if (SphereSphere(
+            playerPos,
+            playerRadius,
+            ship->GetPosition(),
+            ship->GetRadius()
+        )) {
       m_GameOver = true;
       return;
     }
@@ -551,39 +656,63 @@ void Application::CheckCollisions() {
   // Enemy ships vs asteroids -> remove ship
   auto shipHitsAsteroid = [&](glm::vec4 pos, float r) {
     for (const auto &asteroid : m_Asteroids)
-      if (SphereSphere(pos, r, asteroid->GetPosition(), asteroid->GetRadius()))
+      if (SphereSphere(
+              pos,
+              r,
+              asteroid->GetPosition(),
+              asteroid->GetRadius()
+          )) {
+        std::cout << "A TIE hit an asteroid!" << std::endl;
         return true;
+      }
     return false;
   };
 
   m_TieFighters.erase(
-      std::remove_if(m_TieFighters.begin(), m_TieFighters.end(),
+      std::remove_if(
+          m_TieFighters.begin(),
+          m_TieFighters.end(),
           [&](const std::unique_ptr<TieFighter> &s) {
             return shipHitsAsteroid(s->GetPosition(), s->GetRadius());
-          }),
-      m_TieFighters.end());
+          }
+      ),
+      m_TieFighters.end()
+  );
 
   m_TieDefenders.erase(
-      std::remove_if(m_TieDefenders.begin(), m_TieDefenders.end(),
+      std::remove_if(
+          m_TieDefenders.begin(),
+          m_TieDefenders.end(),
           [&](const std::unique_ptr<TieDefender> &s) {
             return shipHitsAsteroid(s->GetPosition(), s->GetRadius());
-          }),
-      m_TieDefenders.end());
+          }
+      ),
+      m_TieDefenders.end()
+  );
 
   m_TiePhantoms.erase(
-      std::remove_if(m_TiePhantoms.begin(), m_TiePhantoms.end(),
+      std::remove_if(
+          m_TiePhantoms.begin(),
+          m_TiePhantoms.end(),
           [&](const std::unique_ptr<TiePhantom> &s) {
             return shipHitsAsteroid(s->GetPosition(), s->GetRadius());
-          }),
-      m_TiePhantoms.end());
+          }
+      ),
+      m_TiePhantoms.end()
+  );
 
   // Enemy ships vs enemy ships -> remove both
   auto removeCollidingShips = [&](auto &ships) {
     std::vector<size_t> toRemove;
     for (size_t i = 0; i < ships.size(); ++i)
       for (size_t j = i + 1; j < ships.size(); ++j)
-        if (SphereSphere(ships[i]->GetPosition(), ships[i]->GetRadius(),
-                         ships[j]->GetPosition(), ships[j]->GetRadius())) {
+        if (SphereSphere(
+                ships[i]->GetPosition(),
+                ships[i]->GetRadius(),
+                ships[j]->GetPosition(),
+                ships[j]->GetRadius()
+            )) {
+          std::cout << "Two TIEs collided" << std::endl;
           toRemove.push_back(i);
           toRemove.push_back(j);
         }
@@ -599,8 +728,12 @@ void Application::CheckCollisions() {
   // Asteroid vs asteroid -> reverse both directions
   for (size_t i = 0; i < m_Asteroids.size(); ++i)
     for (size_t j = i + 1; j < m_Asteroids.size(); ++j)
-      if (SphereSphere(m_Asteroids[i]->GetPosition(), m_Asteroids[i]->GetRadius(),
-                       m_Asteroids[j]->GetPosition(), m_Asteroids[j]->GetRadius())) {
+      if (SphereSphere(
+              m_Asteroids[i]->GetPosition(),
+              m_Asteroids[i]->GetRadius(),
+              m_Asteroids[j]->GetPosition(),
+              m_Asteroids[j]->GetRadius()
+          )) {
         m_Asteroids[i]->ReverseDirection();
         m_Asteroids[j]->ReverseDirection();
       }
@@ -619,6 +752,11 @@ void Application::TextRendering_ShowGameOver() {
   float y = 0.0f;
 
   TextRendering_PrintString(
-      m_Window, msg, x, y, 2.0f, glm::vec4(1.0f, 0.2f, 0.2f, 1.0f)
+      m_Window,
+      msg,
+      x,
+      y,
+      2.0f,
+      glm::vec4(1.0f, 0.2f, 0.2f, 1.0f)
   );
 }

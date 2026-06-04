@@ -112,6 +112,7 @@ private:
 
   void Update(float deltaTime);
   void Render();
+  void RenderMinimap();
   void CheckCollisions();
 
   // UI Helpers
@@ -121,5 +122,31 @@ private:
   void TextRendering_ShowGameOver();
 
   void LoadModel(const char *path, const std::string& prefix = "");
+
+  template <typename T>
+  void SpawnSquadrons(int numSquads, int unitsPerSquad, float distance, std::vector<std::unique_ptr<T>>& container) {
+    static float currentAngle = 0.0f;
+    const float totalExpectedSquads = 11.0f; // 6 Fighters + 3 Phantoms + 2 Defenders
+    const float angleStep = (2.0f * 3.14159265f) / totalExpectedSquads;
+
+    for (int s = 0; s < numSquads; ++s) {
+      glm::vec4 center = glm::vec4(
+          distance * cos(currentAngle),
+          (rand() % 40) - 20.0f,
+          distance * sin(currentAngle),
+          1.0f
+      );
+      for (int i = 0; i < unitsPerSquad; ++i) {
+        glm::vec4 offset = glm::vec4(
+            (rand() % 10) - 5.0f,
+            (rand() % 10) - 5.0f,
+            (rand() % 10) - 5.0f,
+            0.0f
+        );
+        container.push_back(std::make_unique<T>(center + offset));
+      }
+      currentAngle += angleStep;
+    }
+  }
 };
 #endif // APPLICATION_H

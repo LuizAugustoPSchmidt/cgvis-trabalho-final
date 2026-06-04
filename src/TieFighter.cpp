@@ -8,7 +8,7 @@ constexpr float ACCELERATION_MAX = 10.0f;
 constexpr float SPEED_MAX = 30.0f;
 
 TieFighter::TieFighter(glm::vec4 position)
-    : GameObject("tiefighter_TIE_FIghter_Sphere.004", TIE_FIGHTER),
+    : GameObject("tiefighter_TIE_FIghter_Sphere.004", TIE_FIGHTER, "tie-fighter"),
       m_Position(position) {}
 
 void TieFighter::Update(float deltaTime) {

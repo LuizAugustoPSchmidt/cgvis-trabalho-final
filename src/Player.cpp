@@ -10,7 +10,7 @@ constexpr float BOOST_ACCEL = 30.0f;
 constexpr float BOOST_DECEL = 20.0f;
 
 Player::Player()
-    : GameObject("spaceship", SPACESHIP_MATERIAL),
+    : GameObject("spaceship", SPACESHIP_MATERIAL, "player"),
       m_Position(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
       m_Forward(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)),
       m_Up(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)),

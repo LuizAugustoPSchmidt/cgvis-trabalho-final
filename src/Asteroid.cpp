@@ -28,7 +28,7 @@ static glm::vec4 CubicBezier(
 }
 
 Asteroid::Asteroid(glm::vec4 position, glm::vec4 scale, glm::mat4 rotation)
-    : GameObject("rock.001_rock.013", ASTEROID), m_Position(position),
+    : GameObject("rock.001_rock.013", ASTEROID, "asteroid"), m_Position(position),
       m_Scale(scale), m_Rotation(rotation) {}
 
 void Asteroid::Update(float deltaTime) {

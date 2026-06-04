@@ -8,7 +8,7 @@ constexpr float ACCELERATION_MAX = 10.0f;
 constexpr float SPEED_MAX = 30.0f;
 
 TiePhantom::TiePhantom(glm::vec4 position)
-    : GameObject("tiephantom_mat0", TIE_PHANTOM_HULL), m_Position(position) {
+    : GameObject("tiephantom_mat0", TIE_PHANTOM_HULL, "tie-phantom"), m_Position(position) {
   m_Parts = {
       {"tiephantom_mat0", TIE_PHANTOM_HULL},
       {"tiephantom_mat1", TIE_PHANTOM_WINGS},

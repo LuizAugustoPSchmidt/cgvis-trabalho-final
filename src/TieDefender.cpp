@@ -8,7 +8,7 @@ constexpr float ACCELERATION_MAX = 10.0f;
 constexpr float SPEED_MAX = 30.0f;
 
 TieDefender::TieDefender(glm::vec4 position)
-    : GameObject("tiedefender_obj1", TIE_DEFENDER), m_Position(position) {}
+    : GameObject("tiedefender_obj1", TIE_DEFENDER, "tie-defender"), m_Position(position) {}
 
 void TieDefender::Update(float deltaTime) {
   // 1. Calculate Acceleration (Steering Force) towards the target

@@ -15,6 +15,10 @@ public:
 
   void SetTarget(glm::vec4 target) { m_Target = target; }
   glm::vec4 GetPosition() const { return m_Position; }
+  glm::vec4 GetForward() const {
+    float s = glm::length(m_Velocity);
+    return s > 0.001f ? m_Velocity / s : glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+  }
   float GetRadius() const { return 1.0f; }
 
 private:
