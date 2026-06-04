@@ -1,7 +1,11 @@
 #include "TiePhantom.h"
 #include "Application.h"
 #include "ObjectIds.h"
+#include "glm/geometric.hpp"
 #include "matrices.h"
+
+constexpr float ACCELERATION_MAX = 10.0f;
+constexpr float SPEED_MAX = 30.0f;
 
 TiePhantom::TiePhantom(glm::vec4 position)
     : GameObject("tiephantom_mat0", TIE_PHANTOM_HULL), m_Position(position) {
@@ -16,7 +20,31 @@ TiePhantom::TiePhantom(glm::vec4 position)
 }
 
 void TiePhantom::Update(float deltaTime) {
-  m_RotationMatrix = Matrix_Look_At(m_Position, m_Target, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f));
+  // 1. Calculate Acceleration (Steering Force) towards the target
+  glm::vec4 targetDir = m_Target - m_Position;
+  float dist = glm::length(targetDir);
+  if (dist > 0.001f) {
+    m_Acceleration = (targetDir / dist) * ACCELERATION_MAX;
+  }
+
+  // 2. Physics Integration
+  m_Velocity += m_Acceleration * deltaTime;
+
+  float speed = glm::length(m_Velocity);
+  if (speed > SPEED_MAX) {
+    m_Velocity = (m_Velocity / speed) * SPEED_MAX;
+  }
+  m_Position += m_Velocity * deltaTime;
+
+  // 3. Align Rotation Matrix with Velocity (Moving Forward)
+  if (speed > 0.001f) {
+    glm::vec4 forward = m_Velocity / speed;
+    m_RotationMatrix = Matrix_Look_At(
+        m_Position,
+        m_Position + forward,
+        glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)
+    );
+  }
 }
 
 void TiePhantom::Render(Application &app) {
@@ -30,4 +58,10 @@ void TiePhantom::Render(Application &app) {
   for (const auto &part : m_Parts) {
     app.DrawObject(part.name.c_str(), part.object_id, model);
   }
+
+#if !RELEASE
+  // Debug Vectors
+  app.DrawLine(m_Position, m_Position + m_Velocity, DEBUG_VECTOR_GREEN);
+  app.DrawLine(m_Position, m_Position + m_Acceleration, DEBUG_VECTOR_RED);
+#endif // !RELEASE
 }

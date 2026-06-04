@@ -1,13 +1,11 @@
 #include "TieFighter.h"
 #include "Application.h"
 #include "ObjectIds.h"
-#include "glm/common.hpp"
 #include "glm/geometric.hpp"
 #include "matrices.h"
 
 constexpr float ACCELERATION_MAX = 10.0f;
 constexpr float SPEED_MAX = 30.0f;
-constexpr float TURN_SPEED = 2.0f;
 
 TieFighter::TieFighter(glm::vec4 position)
     : GameObject("tiefighter_TIE_FIghter_Sphere.004", TIE_FIGHTER),
