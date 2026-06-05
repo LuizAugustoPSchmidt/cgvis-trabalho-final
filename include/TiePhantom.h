@@ -21,9 +21,9 @@ public:
   virtual void Render(Application &app) override;
 
   void SetTarget(glm::vec4 target) { m_Target = target; }
-  glm::vec4 GetPosition() const { return m_Position; }
+  virtual glm::vec4 GetPosition() const override { return m_Position; }
   glm::vec4 GetForward() const { return m_RotationMatrix[2]; }
-  float GetRadius() const { return 2.0f; }
+  virtual float GetRadius() const override { return 2.0f; }
 
 private:
   glm::vec4 m_Position;

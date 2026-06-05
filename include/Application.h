@@ -20,6 +20,7 @@
 #include <memory>
 #include <stack>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 class Application {
@@ -47,6 +48,13 @@ public:
   void CursorPosCallback(double xpos, double ypos);
   void ScrollCallback(double xoffset, double yoffset);
   void FramebufferSizeCallback(int width, int height);
+
+  void SetCallbacks();
+  void SetKeyCallback();
+  void SetMouseButtonCallback();
+  void SetCursorPosCallback();
+  void SetMouseScrollCallback();
+  void SetFramebufferSizeCallback();
 
 private:
   GLFWwindow *m_Window;
@@ -122,6 +130,41 @@ private:
   void TextRendering_ShowGameOver();
 
   void LoadModel(const char *path, const std::string& prefix = "");
+
+  static GameObject *ToRaw(GameObject *p) { return p; }
+  template <typename T>
+  static GameObject *ToRaw(const std::unique_ptr<T> &p) {
+    return p.get();
+  }
+
+  static bool SphereSphere(glm::vec4 posA, float rA, glm::vec4 posB, float rB);
+
+  template <typename T, typename U, typename F>
+  void CheckCollisions(T &a, U &b, F onCollision) {
+    bool sameGroup = false;
+    // Check if both containers are actually the same object to avoid double counting
+    if constexpr (std::is_same_v<T, U>) {
+      if ((void *)&a == (void *)&b)
+        sameGroup = true;
+    }
+
+    for (size_t i = 0; i < a.size(); ++i) {
+      // If same group, start j from i+1 to avoid self-collision and duplicate pairs
+      size_t startJ = sameGroup ? i + 1 : 0;
+      for (size_t j = startJ; j < b.size(); ++j) {
+        auto *pA = ToRaw(a[i]);
+        auto *pB = ToRaw(b[j]);
+        if (pA != pB && SphereSphere(
+                            pA->GetPosition(),
+                            pA->GetRadius(),
+                            pB->GetPosition(),
+                            pB->GetRadius()
+                        )) {
+          onCollision(a[i], b[j]);
+        }
+      }
+    }
+  }
 
   template <typename T>
   void SpawnSquadrons(int numSquads, int unitsPerSquad, float distance, std::vector<std::unique_ptr<T>>& container) {

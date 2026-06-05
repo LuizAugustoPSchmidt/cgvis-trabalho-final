@@ -14,8 +14,8 @@ public:
   virtual void Render(Application &app) override;
 
   float GetCurveAngle() const { return m_CurveAngle; }
-  glm::vec4 GetPosition() const { return m_Position; }
-  float GetRadius() const { return 2.0f; }
+  virtual glm::vec4 GetPosition() const override { return m_Position; }
+  virtual float GetRadius() const override { return 2.0f; }
   void ReverseDirection() { m_Direction = -m_Direction; }
 
 private:

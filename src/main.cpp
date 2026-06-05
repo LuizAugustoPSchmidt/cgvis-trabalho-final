@@ -69,58 +69,13 @@ ObjModel::ObjModel(
   printf("OK.\n");
 }
 
-// Global callback wrappers
-void ErrorCallback(int error, const char *description) {
-  fprintf(stderr, "ERROR: GLFW: %s\n", description);
-}
-
-void KeyCallback(
-    GLFWwindow *window, int key, int scancode, int action, int mod
-) {
-  auto app = static_cast<Application *>(glfwGetWindowUserPointer(window));
-  if (app)
-    app->KeyCallback(key, scancode, action, mod);
-}
-
-void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
-  auto app = static_cast<Application *>(glfwGetWindowUserPointer(window));
-  if (app)
-    app->MouseButtonCallback(button, action, mods);
-}
-
-void CursorPosCallback(GLFWwindow *window, double xpos, double ypos) {
-  auto app = static_cast<Application *>(glfwGetWindowUserPointer(window));
-  if (app)
-    app->CursorPosCallback(xpos, ypos);
-}
-
-void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset) {
-  auto app = static_cast<Application *>(glfwGetWindowUserPointer(window));
-  if (app)
-    app->ScrollCallback(xoffset, yoffset);
-}
-
-void FramebufferSizeCallback(GLFWwindow *window, int width, int height) {
-  auto app = static_cast<Application *>(glfwGetWindowUserPointer(window));
-  if (app)
-    app->FramebufferSizeCallback(width, height);
-}
-
 int main(int argc, char *argv[]) {
   std::srand(static_cast<unsigned int>(std::time(nullptr)));
   Application app;
   if (!app.Init())
     return EXIT_FAILURE;
 
-  // We need to set the callbacks before loading assets if they rely on window
-  // state
-  glfwSetKeyCallback(glfwGetCurrentContext(), KeyCallback);
-  glfwSetMouseButtonCallback(glfwGetCurrentContext(), MouseButtonCallback);
-  glfwSetCursorPosCallback(glfwGetCurrentContext(), CursorPosCallback);
-  glfwSetScrollCallback(glfwGetCurrentContext(), ScrollCallback);
-  glfwSetFramebufferSizeCallback(
-      glfwGetCurrentContext(), FramebufferSizeCallback
-  );
+  app.SetCallbacks();
 
   app.LoadAssets(argc, argv);
   app.Run();

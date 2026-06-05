@@ -594,7 +594,9 @@ void Application::FramebufferSizeCallback(int width, int height) {
   m_ScreenRatio = (float)width / height;
 }
 
-static bool SphereSphere(glm::vec4 posA, float rA, glm::vec4 posB, float rB) {
+bool Application::SphereSphere(
+    glm::vec4 posA, float rA, glm::vec4 posB, float rB
+) {
   glm::vec4 d = posA - posB;
   float dist2 = d.x * d.x + d.y * d.y + d.z * d.z;
   float rSum = rA + rB;
@@ -602,141 +604,69 @@ static bool SphereSphere(glm::vec4 posA, float rA, glm::vec4 posB, float rB) {
 }
 
 void Application::CheckCollisions() {
-  glm::vec4 playerPos = m_Player->GetPosition();
-  float playerRadius = m_Player->GetRadius();
+  // 1. Player vs Harmful (Enemies + Asteroids)
+  std::vector<GameObject *> harmfulObjects;
+  for (auto &a : m_Asteroids) harmfulObjects.push_back(a.get());
+  for (auto &s : m_TieFighters) harmfulObjects.push_back(s.get());
+  for (auto &s : m_TieDefenders) harmfulObjects.push_back(s.get());
+  for (auto &s : m_TiePhantoms) harmfulObjects.push_back(s.get());
 
-  // Player vs asteroids
-  for (const auto &asteroid : m_Asteroids) {
-    if (SphereSphere(
-            playerPos,
-            playerRadius,
-            asteroid->GetPosition(),
-            asteroid->GetRadius()
-        )) {
-      m_GameOver = true;
-      return;
-    }
-  }
+  std::vector<GameObject *> playerVec = {m_Player.get()};
 
-  // Player vs enemy ships
-  for (const auto &ship : m_TieFighters) {
-    if (SphereSphere(
-            playerPos,
-            playerRadius,
-            ship->GetPosition(),
-            ship->GetRadius()
-        )) {
-      m_GameOver = true;
-      return;
-    }
-  }
-  for (const auto &ship : m_TieDefenders) {
-    if (SphereSphere(
-            playerPos,
-            playerRadius,
-            ship->GetPosition(),
-            ship->GetRadius()
-        )) {
-      m_GameOver = true;
-      return;
-    }
-  }
-  for (const auto &ship : m_TiePhantoms) {
-    if (SphereSphere(
-            playerPos,
-            playerRadius,
-            ship->GetPosition(),
-            ship->GetRadius()
-        )) {
-      m_GameOver = true;
-      return;
-    }
-  }
+  CheckCollisions(playerVec, harmfulObjects, [&](auto &p, auto &h) {
+    m_GameOver = true;
+  });
 
-  // Enemy ships vs asteroids -> remove ship
-  auto shipHitsAsteroid = [&](glm::vec4 pos, float r) {
-    for (const auto &asteroid : m_Asteroids)
-      if (SphereSphere(
-              pos,
-              r,
-              asteroid->GetPosition(),
-              asteroid->GetRadius()
-          )) {
-        std::cout << "A TIE hit an asteroid!" << std::endl;
-        return true;
-      }
-    return false;
+  if (m_GameOver)
+    return;
+
+  // 2. Enemies vs Asteroids
+  auto enemyVsAsteroids = [&](auto &enemies) {
+    CheckCollisions(enemies, m_Asteroids, [](auto &s, auto &a) {
+#if !RELEASE
+      std::cout << s->GetClassId() << " hit an asteroid" << std::endl;
+#endif // !RELEASE
+      s->Kill();
+    });
   };
+  enemyVsAsteroids(m_TieFighters);
+  enemyVsAsteroids(m_TieDefenders);
+  enemyVsAsteroids(m_TiePhantoms);
 
-  m_TieFighters.erase(
-      std::remove_if(
-          m_TieFighters.begin(),
-          m_TieFighters.end(),
-          [&](const std::unique_ptr<TieFighter> &s) {
-            return shipHitsAsteroid(s->GetPosition(), s->GetRadius());
-          }
-      ),
-      m_TieFighters.end()
-  );
+  // 3. Enemy vs Enemy
+  std::vector<GameObject *> allEnemies;
+  for (auto &s : m_TieFighters) allEnemies.push_back(s.get());
+  for (auto &s : m_TieDefenders) allEnemies.push_back(s.get());
+  for (auto &s : m_TiePhantoms) allEnemies.push_back(s.get());
 
-  m_TieDefenders.erase(
-      std::remove_if(
-          m_TieDefenders.begin(),
-          m_TieDefenders.end(),
-          [&](const std::unique_ptr<TieDefender> &s) {
-            return shipHitsAsteroid(s->GetPosition(), s->GetRadius());
-          }
-      ),
-      m_TieDefenders.end()
-  );
+  CheckCollisions(allEnemies, allEnemies, [](auto &s1, auto &s2) {
+#if !RELEASE
+    std::cout << s1->GetClassId() << " and " << s2->GetClassId() << " hit. Both dead" << std::endl;
+#endif // !RELEASE
+    s1->Kill();
+    s2->Kill();
+  });
 
-  m_TiePhantoms.erase(
-      std::remove_if(
-          m_TiePhantoms.begin(),
-          m_TiePhantoms.end(),
-          [&](const std::unique_ptr<TiePhantom> &s) {
-            return shipHitsAsteroid(s->GetPosition(), s->GetRadius());
-          }
-      ),
-      m_TiePhantoms.end()
-  );
-
-  // Enemy ships vs enemy ships -> remove both
-  auto removeCollidingShips = [&](auto &ships) {
-    std::vector<size_t> toRemove;
-    for (size_t i = 0; i < ships.size(); ++i)
-      for (size_t j = i + 1; j < ships.size(); ++j)
-        if (SphereSphere(
-                ships[i]->GetPosition(),
-                ships[i]->GetRadius(),
-                ships[j]->GetPosition(),
-                ships[j]->GetRadius()
-            )) {
-          std::cout << "Two TIEs collided" << std::endl;
-          toRemove.push_back(i);
-          toRemove.push_back(j);
-        }
-    for (size_t i = ships.size(); i-- > 0;)
-      if (std::find(toRemove.begin(), toRemove.end(), i) != toRemove.end())
-        ships.erase(ships.begin() + i);
+  // 4. Cleanup dead ships
+  auto cleanup = [](auto &vec) {
+    vec.erase(
+        std::remove_if(
+            vec.begin(),
+            vec.end(),
+            [](const auto &s) { return s->IsDead(); }
+        ),
+        vec.end()
+    );
   };
+  cleanup(m_TieFighters);
+  cleanup(m_TieDefenders);
+  cleanup(m_TiePhantoms);
 
-  removeCollidingShips(m_TieFighters);
-  removeCollidingShips(m_TieDefenders);
-  removeCollidingShips(m_TiePhantoms);
-
-  // Asteroid vs asteroid -> reverse both directions
-  for (size_t i = 0; i < m_Asteroids.size(); ++i)
-    for (size_t j = i + 1; j < m_Asteroids.size(); ++j)
-      if (SphereSphere(
-              m_Asteroids[i]->GetPosition(),
-              m_Asteroids[i]->GetRadius(),
-              m_Asteroids[j]->GetPosition(),
-              m_Asteroids[j]->GetRadius()
-          )) {
-        m_Asteroids[i]->ReverseDirection();
-        m_Asteroids[j]->ReverseDirection();
-      }
+  // 5. Asteroid vs Asteroid
+  CheckCollisions(m_Asteroids, m_Asteroids, [](auto &a1, auto &a2) {
+    a1->ReverseDirection();
+    a2->ReverseDirection();
+  });
 }
 
 void Application::TextRendering_ShowGameOver() {

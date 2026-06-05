@@ -2,6 +2,7 @@
 #define GAMEOBJECT_H
 
 #include <string>
+#include <glm/vec4.hpp>
 
 class Application; // Forward declaration
 
@@ -13,12 +14,18 @@ public:
   virtual void Update(float deltaTime) = 0;
   virtual void Render(Application &app) = 0;
 
+  virtual glm::vec4 GetPosition() const = 0;
+  virtual float GetRadius() const = 0;
+
   std::string GetClassId() const { return m_ClassId; }
+  bool IsDead() const { return m_IsDead; }
+  void Kill() { m_IsDead = true; }
 
 protected:
   std::string m_ModelName;
   int m_ObjectId;
   const std::string m_ClassId;
+  bool m_IsDead = false;
 };
 
 #endif // GAMEOBJECT_H
