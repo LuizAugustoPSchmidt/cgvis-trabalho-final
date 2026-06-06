@@ -232,7 +232,7 @@ void main()
     }
     else if ( object_id == LASER_BOLT )
     {
-        Kd0 = vec3(1.0, 0.1, 0.0);
+        Kd0 = vec3(0.0, 1.0, 0.1);
     }
 
     // Equação de Iluminação

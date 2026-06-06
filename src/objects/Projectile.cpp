@@ -16,8 +16,10 @@ void Projectile::Update(float deltaTime) {
 }
 
 void Projectile::Render(Application &app) {
+  glm::vec4 tip = m_Position + m_Velocity * 0.1f;
   glm::mat4 model =
       Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
-      Matrix_Scale(0.15f, 0.15f, 0.15f);
+      Matrix_Look_At(m_Position, tip, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)) *
+      Matrix_Scale(0.08f, 0.08f, 2.5f);
   app.DrawObject("the_sphere", LASER_BOLT, model);
 }
