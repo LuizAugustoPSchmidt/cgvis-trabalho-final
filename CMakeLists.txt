@@ -8,6 +8,10 @@
 set(SOURCES
   src/main.cpp
   src/Application.cpp
+  src/Callbacks.cpp
+  src/Physics.cpp
+  src/Rendering.cpp
+  src/UI.cpp
   src/Player.cpp
   src/Asteroid.cpp
   src/TieFighter.cpp
