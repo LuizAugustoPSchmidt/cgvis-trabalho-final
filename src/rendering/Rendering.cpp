@@ -6,10 +6,14 @@
 #include <algorithm>
 
 void Application::Render() {
-  glClearColor(0.9f, 0.9f, 1.0f, 1.0f);
+  glClearColor(0.01f, 0.01f, 0.02f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   m_MainShader->Use();
+
+  // Set Lighting Uniforms
+  m_MainShader->SetVec3("ambient_light_top", glm::vec3(0.1f, 0.1f, 0.15f));
+  m_MainShader->SetVec3("ambient_light_bottom", glm::vec3(0.01f, 0.01f, 0.02f));
 
   glm::vec4 camera_view_vector = m_CameraLookAt - m_CameraPosition;
   glm::mat4 view =

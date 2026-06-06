@@ -18,6 +18,10 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+// Light uniforms for Hemispherical Ambient
+uniform vec3 ambient_light_top;
+uniform vec3 ambient_light_bottom;
+
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
 #define BUNNY  1
@@ -238,12 +242,15 @@ void main()
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
 
+    // Hemispherical Ambient calculation
+    vec3 ambient = mix(ambient_light_bottom, ambient_light_top, n.y * 0.5 + 0.5);
+
     if (object_id == BACKGROUND)
         color.rgb = Kd0;
     else if (object_id >= 100) // Debug vectors are unlit
         color.rgb = Kd0;
     else
-        color.rgb = Kd0 * (lambert + 0.01);
+        color.rgb = Kd0 * (lambert + ambient);
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
     // necessário:
