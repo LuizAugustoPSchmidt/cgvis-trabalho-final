@@ -1,5 +1,5 @@
 #include "Texture.h"
-#include <stb_image.h>
+#include <vendor/stb_image.h>
 #include <iostream>
 
 Texture::Texture(const char* path, GLuint unit) : m_Unit(unit) {

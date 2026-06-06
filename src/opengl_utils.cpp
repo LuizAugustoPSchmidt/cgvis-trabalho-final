@@ -4,8 +4,8 @@
 #include "Texture.h"
 #include "VertexArray.h"
 #include "MeshData.h"
-#include <stb_image.h>
-#include <tiny_obj_loader.h>
+#include <vendor/stb_image.h>
+#include <vendor/tiny_obj_loader.h>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>

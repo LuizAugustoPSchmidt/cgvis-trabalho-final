@@ -9,7 +9,7 @@
 #include <glm/vec4.hpp>
 
 #include "utils.h"
-#include "dejavufont.h"
+#include "vendor/dejavufont.h"
 #include "opengl_utils.h"
 
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Função definida em main.cpp

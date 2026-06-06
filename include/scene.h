@@ -11,7 +11,7 @@
 #include <stack>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
-#include <tiny_obj_loader.h>
+#include <vendor/tiny_obj_loader.h>
 // clang-format on
 
 // Estrutura que representa um modelo geométrico carregado a partir de um

@@ -19,10 +19,10 @@ set(SOURCES
   src/objects/TiePhantom.cpp
   src/opengl_utils.cpp
   src/correcao.cpp
-  src/textrendering.cpp
-  src/tiny_obj_loader.cpp
-  src/stb_image.cpp
-  src/glad.c
+  src/vendor/textrendering.cpp
+  src/vendor/tiny_obj_loader.cpp
+  src/vendor/stb_image.cpp
+  src/vendor/glad.c
   src/Shader.cpp
   src/Texture.cpp
   src/Buffer.cpp
