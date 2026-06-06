@@ -18,6 +18,8 @@
 - [ ] Iluminação
 - [x] Curva de Bezier
 - [x] Colisões
+- [ ] Centrar bg na camera
+- [ ] Adicionar animações de explosão;
 
 ## Inteligência Artificial
 
