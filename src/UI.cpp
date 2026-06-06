@@ -44,6 +44,28 @@ void Application::TextRendering_ShowFramesPerSecond() {
   );
 }
 
+void Application::TextRendering_ShowVictory() {
+  if (!m_Victory)
+    return;
+
+  const char *msg = "YOU WIN";
+  int numchars = 7;
+  float lineheight = TextRendering_LineHeight(m_Window);
+  float charwidth = TextRendering_CharWidth(m_Window);
+
+  float x = -(numchars / 2.0f) * charwidth * 2.0f;
+  float y = 0.0f;
+
+  TextRendering_PrintString(
+      m_Window,
+      msg,
+      x,
+      y,
+      2.0f,
+      glm::vec4(0.2f, 1.0f, 0.2f, 1.0f)
+  );
+}
+
 void Application::TextRendering_ShowGameOver() {
   if (!m_GameOver)
     return;

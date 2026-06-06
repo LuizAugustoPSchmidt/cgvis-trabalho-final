@@ -214,7 +214,7 @@ void Application::Update(float deltaTime) {
   m_Player->SetPhi(m_CameraPhi);
   m_Player->UpdateOrientation();
 
-  if (!m_Paused) {
+  if (!m_Paused && !m_Victory) {
     m_Player->Update(deltaTime);
     for (auto &asteroid : m_Asteroids)
       asteroid->Update(deltaTime);
@@ -269,6 +269,9 @@ void Application::Cleanup() {
   cleanup(m_TieFighters);
   cleanup(m_TieDefenders);
   cleanup(m_TiePhantoms);
+
+  if (m_TieFighters.empty() && m_TieDefenders.empty() && m_TiePhantoms.empty())
+    m_Victory = true;
 }
 
 void Application::Shutdown() {

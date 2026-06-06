@@ -97,6 +97,7 @@ private:
 
   // Game State
   bool m_GameOver = false;
+  bool m_Victory = false;
   bool m_Paused = false;
 
   // Other State
@@ -132,6 +133,7 @@ private:
   void TextRendering_ShowProjection();
   void TextRendering_ShowFramesPerSecond();
   void TextRendering_ShowGameOver();
+  void TextRendering_ShowVictory();
 
   void LoadModel(const char *path, const std::string &prefix = "");
 
