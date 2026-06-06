@@ -1,4 +1,4 @@
-#include "Buffer.h"
+#include "rendering/Buffer.h"
 
 // VertexBuffer
 VertexBuffer::VertexBuffer(const void* data, GLuint size) {

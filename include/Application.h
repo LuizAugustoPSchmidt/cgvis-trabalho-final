@@ -7,12 +7,12 @@
 
 #include "objects/Asteroid.h"
 #include "objects/Player.h"
-#include "Shader.h"
-#include "Texture.h"
+#include "rendering/Shader.h"
+#include "rendering/Texture.h"
 #include "objects/TieDefender.h"
 #include "objects/TieFighter.h"
 #include "objects/TiePhantom.h"
-#include "VertexArray.h"
+#include "rendering/VertexArray.h"
 #include "scene.h"
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>

@@ -1,8 +1,8 @@
 #include "opengl_utils.h"
 #include "matrices.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "VertexArray.h"
+#include "rendering/Shader.h"
+#include "rendering/Texture.h"
+#include "rendering/VertexArray.h"
 #include "MeshData.h"
 #include <vendor/stb_image.h>
 #include <vendor/tiny_obj_loader.h>

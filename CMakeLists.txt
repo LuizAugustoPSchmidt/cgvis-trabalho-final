@@ -10,7 +10,7 @@ set(SOURCES
   src/Application.cpp
   src/Callbacks.cpp
   src/Physics.cpp
-  src/Rendering.cpp
+  src/rendering/Rendering.cpp
   src/UI.cpp
   src/objects/Player.cpp
   src/objects/Asteroid.cpp
@@ -23,10 +23,10 @@ set(SOURCES
   src/vendor/tiny_obj_loader.cpp
   src/vendor/stb_image.cpp
   src/vendor/glad.c
-  src/Shader.cpp
-  src/Texture.cpp
-  src/Buffer.cpp
-  src/VertexArray.cpp
+  src/rendering/Shader.cpp
+  src/rendering/Texture.cpp
+  src/rendering/Buffer.cpp
+  src/rendering/VertexArray.cpp
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

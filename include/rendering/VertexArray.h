@@ -2,7 +2,7 @@
 #define VERTEXARRAY_H
 
 #include <glad/glad.h>
-#include "Buffer.h"
+#include "rendering/Buffer.h"
 
 class VertexArray {
 public:
