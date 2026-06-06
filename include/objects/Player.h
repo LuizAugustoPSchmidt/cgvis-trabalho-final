@@ -2,7 +2,9 @@
 #define PLAYER_H
 
 #include "objects/GameObject.h"
+#include "objects/Projectile.h"
 #include <glm/vec4.hpp>
+#include <memory>
 #include <vector>
 #include <string>
 
@@ -31,6 +33,9 @@ public:
   void SetPhi(float phi) { m_Phi = phi; }
   void SetBoosting(bool boosting) { m_IsBoosting = boosting; }
 
+  void Shoot();
+  std::vector<std::unique_ptr<Projectile>> &GetProjectiles() { return m_Projectiles; }
+
 private:
   float m_Theta = 0.0f;
   float m_Phi = 0.0f;
@@ -41,6 +46,7 @@ private:
   glm::vec4 m_Up;
 
   std::vector<SpaceshipPart> m_Parts;
+  std::vector<std::unique_ptr<Projectile>> m_Projectiles;
 };
 
 #endif // PLAYER_H

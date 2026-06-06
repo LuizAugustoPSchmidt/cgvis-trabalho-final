@@ -46,6 +46,7 @@ uniform mat4 projection;
 #define DEBUG_VECTOR_RED         100
 #define DEBUG_VECTOR_GREEN       101
 #define DEBUG_VECTOR_BLUE        102
+#define LASER_BOLT               103
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -228,6 +229,10 @@ void main()
     else if ( object_id == DEBUG_VECTOR_BLUE )
     {
         Kd0 = vec3(0.0, 0.0, 1.0);
+    }
+    else if ( object_id == LASER_BOLT )
+    {
+        Kd0 = vec3(1.0, 0.1, 0.0);
     }
 
     // Equação de Iluminação

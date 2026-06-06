@@ -52,6 +52,8 @@ void Application::Render() {
 
   // Render Game Objects
   m_Player->Render(*this);
+  for (auto &proj : m_Player->GetProjectiles())
+    proj->Render(*this);
   for (auto &asteroid : m_Asteroids)
     asteroid->Render(*this);
   for (auto &ship : m_TieFighters)

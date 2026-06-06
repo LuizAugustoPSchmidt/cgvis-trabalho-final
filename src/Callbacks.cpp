@@ -89,6 +89,8 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
     else if (action == GLFW_RELEASE)
       m_Player->SetBoosting(false);
   }
+  if (key == GLFW_KEY_SPACE && action == GLFW_PRESS && !m_Paused && !m_GameOver)
+    m_Player->Shoot();
   if (key == GLFW_KEY_I && action == GLFW_PRESS) {
     m_InvertY = !m_InvertY;
 #if !RELEASE

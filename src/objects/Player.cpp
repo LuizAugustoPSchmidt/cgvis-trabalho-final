@@ -3,6 +3,7 @@
 #include "ObjectIds.h"
 #include "matrices.h"
 #include <glad/glad.h>
+#include <algorithm>
 
 constexpr float NORMAL_SPEED = 15.0f;
 constexpr float MAX_BOOST_SPEED = 45.0f;
@@ -58,6 +59,17 @@ void Player::Update(float deltaTime) {
   }
 
   m_Position += m_Forward * m_Speed * deltaTime;
+
+  for (auto &p : m_Projectiles)
+    p->Update(deltaTime);
+  m_Projectiles.erase(
+      std::remove_if(
+          m_Projectiles.begin(),
+          m_Projectiles.end(),
+          [](const auto &p) { return p->IsDead(); }
+      ),
+      m_Projectiles.end()
+  );
 }
 
 void Player::UpdateOrientation() {
@@ -73,6 +85,12 @@ void Player::UpdateOrientation() {
       cos(m_Theta) * sin(m_Phi),
       0.0f
   );
+}
+
+void Player::Shoot() {
+  glm::vec4 spawnPos = m_Position + m_Forward * 2.0f;
+  glm::vec4 velocity = m_Forward * 80.0f;
+  m_Projectiles.push_back(std::make_unique<Projectile>(spawnPos, velocity));
 }
 
 void Player::Render(Application &app) {

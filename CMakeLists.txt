@@ -13,6 +13,7 @@ set(SOURCES
   src/rendering/Rendering.cpp
   src/UI.cpp
   src/objects/Player.cpp
+  src/objects/Projectile.cpp
   src/objects/Asteroid.cpp
   src/objects/TieFighter.cpp
   src/objects/TieDefender.cpp

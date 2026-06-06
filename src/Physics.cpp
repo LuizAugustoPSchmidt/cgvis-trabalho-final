@@ -28,7 +28,13 @@ void Application::CheckCollisions() {
     return;
   }
 
-  // 2. All Enemies vs Asteroids
+  // 2. Projectiles vs Enemies
+  CheckCollisions(m_Player->GetProjectiles(), allEnemies, [](auto &proj, auto &enemy) {
+    proj->Kill();
+    enemy->Kill();
+  });
+
+  // 3. All Enemies vs Asteroids
   CheckCollisions(allEnemies, m_Asteroids, [](auto &s, auto &a) {
 #if !RELEASE
     std::cout << s->GetClassId() << " hit an asteroid" << std::endl;
