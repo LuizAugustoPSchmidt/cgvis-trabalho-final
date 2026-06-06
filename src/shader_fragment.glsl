@@ -22,6 +22,15 @@ uniform mat4 projection;
 uniform vec3 ambient_light_top;
 uniform vec3 ambient_light_bottom;
 
+// Light uniforms for Directional Star Light
+uniform vec4 star_direction; // Direction pointing TO the star
+uniform vec3 star_diffuse_color;
+uniform vec3 star_specular_color;
+
+// Material properties (simplified for now)
+uniform vec3 Ks; // Specular reflectance
+uniform float shininess; // Shininess exponent (q)
+
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
 #define BUNNY  1
@@ -92,11 +101,14 @@ void main()
     // normais de cada vértice.
     vec4 n = normalize(normal);
 
-    // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
-    vec4 l = normalize(vec4(1.0,1.0,0.0,0.0));
+    // Vetor que define o sentido da fonte de luz (Estrela)
+    vec4 l = normalize(star_direction);
 
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
+
+    // Vetor "half-way" para Blinn-Phong
+    vec4 h = normalize(v + l);
 
     // Coordenadas de textura U e V
     float U = 0.0;
@@ -240,7 +252,8 @@ void main()
     }
 
     // Equação de Iluminação
-    float lambert = max(0,dot(n,l));
+    float lambert = max(0, dot(n, l));
+    float blinn_phong_specular = pow(max(0.0, dot(n, h)), shininess);
 
     // Hemispherical Ambient calculation
     vec3 ambient = mix(ambient_light_bottom, ambient_light_top, n.y * 0.5 + 0.5);
@@ -250,7 +263,11 @@ void main()
     else if (object_id >= 100) // Debug vectors are unlit
         color.rgb = Kd0;
     else
-        color.rgb = Kd0 * (lambert + ambient);
+    {
+        vec3 diffuse_term = Kd0 * (star_diffuse_color * lambert + ambient);
+        vec3 specular_term = star_specular_color * Ks * blinn_phong_specular;
+        color.rgb = diffuse_term + specular_term;
+    }
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
     // necessário:

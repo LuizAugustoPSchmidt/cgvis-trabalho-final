@@ -15,6 +15,13 @@ void Application::Render() {
   m_MainShader->SetVec3("ambient_light_top", glm::vec3(0.1f, 0.1f, 0.15f));
   m_MainShader->SetVec3("ambient_light_bottom", glm::vec3(0.01f, 0.01f, 0.02f));
 
+  m_MainShader->SetVec4("star_direction", glm::vec4(1.0f, 1.0f, 0.0f, 0.0f));
+  m_MainShader->SetVec3("star_diffuse_color", glm::vec3(1.0f, 1.0f, 0.8f));
+  m_MainShader->SetVec3("star_specular_color", glm::vec3(1.0f, 1.0f, 1.0f));
+
+  m_MainShader->SetVec3("Ks", glm::vec3(0.5f, 0.5f, 0.5f));
+  m_MainShader->SetFloat("shininess", 32.0f);
+
   glm::vec4 camera_view_vector = m_CameraLookAt - m_CameraPosition;
   glm::mat4 view =
       Matrix_Camera_View(m_CameraPosition, camera_view_vector, m_CameraUp);
