@@ -233,6 +233,8 @@ void Application::Update(float deltaTime) {
 
     if (!m_GameOver)
       CheckCollisions();
+
+    Cleanup();
   }
 
   if (m_CameraMode == CameraMode::ThirdPerson) {
@@ -245,11 +247,28 @@ void Application::Update(float deltaTime) {
   } else {
     // FPV (Aim Mode): Camera is in the cockpit
     // We move the camera slightly forward (0.2) and up (0.2) from ship center
-    m_CameraPosition = m_Player->GetPosition() + (m_Player->GetForward() * 0.2f) +
+    m_CameraPosition = m_Player->GetPosition() +
+                       (m_Player->GetForward() * 0.2f) +
                        (m_Player->GetUp() * 0.2f);
     m_CameraLookAt = m_CameraPosition + m_Player->GetForward();
     m_CameraUp = m_Player->GetUp();
   }
+}
+
+void Application::Cleanup() {
+  auto cleanup = [](auto &vec) {
+    vec.erase(
+        std::remove_if(
+            vec.begin(),
+            vec.end(),
+            [](const auto &s) { return s->IsDead(); }
+        ),
+        vec.end()
+    );
+  };
+  cleanup(m_TieFighters);
+  cleanup(m_TieDefenders);
+  cleanup(m_TiePhantoms);
 }
 
 void Application::Shutdown() {
@@ -257,4 +276,22 @@ void Application::Shutdown() {
     glfwTerminate();
     m_Window = nullptr;
   }
+}
+
+std::vector<GameObject *> Application::GetAllEnemies() {
+  std::vector<GameObject *> enemies;
+  for (auto &s : m_TieFighters)
+    enemies.push_back(s.get());
+  for (auto &s : m_TieDefenders)
+    enemies.push_back(s.get());
+  for (auto &s : m_TiePhantoms)
+    enemies.push_back(s.get());
+  return enemies;
+}
+
+std::vector<GameObject *> Application::GetHarmfulObjects() {
+  std::vector<GameObject *> harmful = GetAllEnemies();
+  for (auto &a : m_Asteroids)
+    harmful.push_back(a.get());
+  return harmful;
 }
