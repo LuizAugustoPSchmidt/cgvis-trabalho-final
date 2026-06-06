@@ -18,14 +18,16 @@ public:
   virtual float GetRadius() const = 0;
 
   std::string GetClassId() const { return m_ClassId; }
-  bool IsDead() const { return m_IsDead; }
-  void Kill() { m_IsDead = true; }
+  bool IsDead() const { return m_Health <= 0; }
+  void Kill() { m_Health = 0; }
+  int GetHealth() const { return m_Health; }
+  void TakeDamage(int amount) { m_Health -= amount; }
 
 protected:
   std::string m_ModelName;
   int m_ObjectId;
   const std::string m_ClassId;
-  bool m_IsDead = false;
+  int m_Health = 3;
 };
 
 #endif // GAMEOBJECT_H

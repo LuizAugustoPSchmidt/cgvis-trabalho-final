@@ -21,17 +21,18 @@ void Application::CheckCollisions() {
   std::vector<GameObject *> allEnemies = GetAllEnemies();
 
   CheckCollisions(playerVec, harmfulObjects, [&](auto &p, auto &h) {
-    m_GameOver = true;
+    m_Player->Kill();
   });
 
-  if (m_GameOver) {
+  if (m_Player->IsDead()) {
+    m_GameOver = true;
     return;
   }
 
   // 2. Projectiles vs Enemies
   CheckCollisions(m_Player->GetProjectiles(), allEnemies, [](auto &proj, auto &enemy) {
     proj->Kill();
-    enemy->Kill();
+    enemy->TakeDamage(1);
   });
 
   // 3. All Enemies vs Asteroids
@@ -42,7 +43,7 @@ void Application::CheckCollisions() {
     s->Kill();
   });
 
-  // 3. Enemy vs Enemy
+  // 4. Enemy vs Enemy
   CheckCollisions(allEnemies, allEnemies, [](auto &s1, auto &s2) {
 #if !RELEASE
     std::cout << s1->GetClassId() << " and " << s2->GetClassId()
@@ -52,7 +53,7 @@ void Application::CheckCollisions() {
     s2->Kill();
   });
 
-  // 4. Asteroid vs Asteroid
+  // 5. Asteroid vs Asteroid
   CheckCollisions(m_Asteroids, m_Asteroids, [](auto &a1, auto &a2) {
     a1->ReverseDirection();
     a2->ReverseDirection();
