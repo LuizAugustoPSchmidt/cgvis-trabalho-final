@@ -1,7 +1,7 @@
 #ifndef TIEPHANTOM_H
 #define TIEPHANTOM_H
 
-#include "GameObject.h"
+#include "objects/GameObject.h"
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <vector>

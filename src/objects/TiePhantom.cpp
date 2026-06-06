@@ -1,4 +1,4 @@
-#include "TieDefender.h"
+#include "objects/TiePhantom.h"
 #include "Application.h"
 #include "ObjectIds.h"
 #include "glm/geometric.hpp"
@@ -7,10 +7,19 @@
 constexpr float ACCELERATION_MAX = 10.0f;
 constexpr float SPEED_MAX = 30.0f;
 
-TieDefender::TieDefender(glm::vec4 position)
-    : GameObject("tiedefender_obj1", TIE_DEFENDER, "tie-defender"), m_Position(position) {}
+TiePhantom::TiePhantom(glm::vec4 position)
+    : GameObject("tiephantom_mat0", TIE_PHANTOM_HULL, "tie-phantom"), m_Position(position) {
+  m_Parts = {
+      {"tiephantom_mat0", TIE_PHANTOM_HULL},
+      {"tiephantom_mat1", TIE_PHANTOM_WINGS},
+      {"tiephantom_mat2", TIE_PHANTOM_WINGS},
+      {"tiephantom_mat3", TIE_PHANTOM_WINGS},
+      {"tiephantom_mat4", TIE_PHANTOM_WINGS},
+      {"tiephantom_mat5", TIE_PHANTOM_WINGS},
+  };
+}
 
-void TieDefender::Update(float deltaTime) {
+void TiePhantom::Update(float deltaTime) {
   // 1. Calculate Acceleration (Steering Force) towards the target
   glm::vec4 targetDir = m_Target - m_Position;
   float dist = glm::length(targetDir);
@@ -38,14 +47,17 @@ void TieDefender::Update(float deltaTime) {
   }
 }
 
-void TieDefender::Render(Application &app) {
-  // Tie Defender: Size ~3000, Center ~ (0, 1120, 160)
-  // Scale by 0.0006 to match TIE Fighter size.
+void TiePhantom::Render(Application &app) {
+  // Tie Phantom: Size ~1.0, already mostly centered.
+  // Scale by 2.0 to match TIE Fighter size.
+  // Rotate 90 degrees around X to point forward.
   glm::mat4 model = Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
                     m_RotationMatrix *
-                    Matrix_Scale(0.0006f, 0.0006f, 0.0006f) *
-                    Matrix_Translate(0.0f, -1120.0f, -160.0f);
-  app.DrawObject(m_ModelName.c_str(), m_ObjectId, model);
+                    Matrix_Scale(2.0f, 2.0f, 2.0f) *
+                    Matrix_Rotate_X(3 * 3.141592f / 2.0f);
+  for (const auto &part : m_Parts) {
+    app.DrawObject(part.name.c_str(), part.object_id, model);
+  }
 
 #if !RELEASE
   // Debug Vectors

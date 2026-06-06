@@ -12,11 +12,11 @@ set(SOURCES
   src/Physics.cpp
   src/Rendering.cpp
   src/UI.cpp
-  src/Player.cpp
-  src/Asteroid.cpp
-  src/TieFighter.cpp
-  src/TieDefender.cpp
-  src/TiePhantom.cpp
+  src/objects/Player.cpp
+  src/objects/Asteroid.cpp
+  src/objects/TieFighter.cpp
+  src/objects/TieDefender.cpp
+  src/objects/TiePhantom.cpp
   src/opengl_utils.cpp
   src/correcao.cpp
   src/textrendering.cpp

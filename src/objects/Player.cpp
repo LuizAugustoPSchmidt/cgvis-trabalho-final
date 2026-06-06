@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "objects/Player.h"
 #include "Application.h"
 #include "ObjectIds.h"
 #include "matrices.h"

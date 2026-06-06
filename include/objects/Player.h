@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "GameObject.h"
+#include "objects/GameObject.h"
 #include <glm/vec4.hpp>
 #include <vector>
 #include <string>

@@ -5,13 +5,13 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "Asteroid.h"
-#include "Player.h"
+#include "objects/Asteroid.h"
+#include "objects/Player.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "TieDefender.h"
-#include "TieFighter.h"
-#include "TiePhantom.h"
+#include "objects/TieDefender.h"
+#include "objects/TieFighter.h"
+#include "objects/TiePhantom.h"
 #include "VertexArray.h"
 #include "scene.h"
 #include <glm/mat4x4.hpp>

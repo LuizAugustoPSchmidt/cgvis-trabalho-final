@@ -1,4 +1,4 @@
-#include "TiePhantom.h"
+#include "objects/TieFighter.h"
 #include "Application.h"
 #include "ObjectIds.h"
 #include "glm/geometric.hpp"
@@ -7,19 +7,11 @@
 constexpr float ACCELERATION_MAX = 10.0f;
 constexpr float SPEED_MAX = 30.0f;
 
-TiePhantom::TiePhantom(glm::vec4 position)
-    : GameObject("tiephantom_mat0", TIE_PHANTOM_HULL, "tie-phantom"), m_Position(position) {
-  m_Parts = {
-      {"tiephantom_mat0", TIE_PHANTOM_HULL},
-      {"tiephantom_mat1", TIE_PHANTOM_WINGS},
-      {"tiephantom_mat2", TIE_PHANTOM_WINGS},
-      {"tiephantom_mat3", TIE_PHANTOM_WINGS},
-      {"tiephantom_mat4", TIE_PHANTOM_WINGS},
-      {"tiephantom_mat5", TIE_PHANTOM_WINGS},
-  };
-}
+TieFighter::TieFighter(glm::vec4 position)
+    : GameObject("tiefighter_TIE_FIghter_Sphere.004", TIE_FIGHTER, "tie-fighter"),
+      m_Position(position) {}
 
-void TiePhantom::Update(float deltaTime) {
+void TieFighter::Update(float deltaTime) {
   // 1. Calculate Acceleration (Steering Force) towards the target
   glm::vec4 targetDir = m_Target - m_Position;
   float dist = glm::length(targetDir);
@@ -47,17 +39,10 @@ void TiePhantom::Update(float deltaTime) {
   }
 }
 
-void TiePhantom::Render(Application &app) {
-  // Tie Phantom: Size ~1.0, already mostly centered.
-  // Scale by 2.0 to match TIE Fighter size.
-  // Rotate 90 degrees around X to point forward.
+void TieFighter::Render(Application &app) {
   glm::mat4 model = Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
-                    m_RotationMatrix *
-                    Matrix_Scale(2.0f, 2.0f, 2.0f) *
-                    Matrix_Rotate_X(3 * 3.141592f / 2.0f);
-  for (const auto &part : m_Parts) {
-    app.DrawObject(part.name.c_str(), part.object_id, model);
-  }
+                    m_RotationMatrix * Matrix_Scale(0.5f, 0.5f, 0.5f);
+  app.DrawObject(m_ModelName.c_str(), m_ObjectId, model);
 
 #if !RELEASE
   // Debug Vectors

@@ -1,4 +1,4 @@
-#include "Asteroid.h"
+#include "objects/Asteroid.h"
 #include "Application.h"
 #include "ObjectIds.h"
 #include "matrices.h"
