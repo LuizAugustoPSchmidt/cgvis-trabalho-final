@@ -35,10 +35,13 @@ void Application::CheckCollisions() {
 
   // 2. Projectiles vs Enemies
   CheckCollisions(m_Projectiles, allEnemies, [](auto &proj, auto &enemy) {
+#if !RELEASE
+    std::cout << enemy->GetClassId() << " hit by " << proj->GetClassId()
+              << std::endl;
+#endif // !RELEASE
     proj->Kill();
     enemy->TakeDamage(1);
   });
-
 
   // 3. All Enemies vs Asteroids
   CheckCollisions(allEnemies, m_Asteroids, [](auto &s, auto &a) {
