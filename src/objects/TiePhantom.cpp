@@ -8,7 +8,8 @@ constexpr float ACCELERATION_MAX = 10.0f;
 constexpr float SPEED_MAX = 30.0f;
 
 TiePhantom::TiePhantom(glm::vec4 position)
-    : GameObject("tiephantom_mat0", TIE_PHANTOM_HULL, "tie-phantom"), m_Position(position) {
+    : GameObject("tiephantom_mat0", TIE_PHANTOM_HULL, "tie-phantom"),
+      m_Position(position) {
   m_Parts = {
       {"tiephantom_mat0", TIE_PHANTOM_HULL},
       {"tiephantom_mat1", TIE_PHANTOM_WINGS},
@@ -52,8 +53,7 @@ void TiePhantom::Render(Application &app) {
   // Scale by 2.0 to match TIE Fighter size.
   // Rotate 90 degrees around X to point forward.
   glm::mat4 model = Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
-                    m_RotationMatrix *
-                    Matrix_Scale(2.0f, 2.0f, 2.0f) *
+                    m_RotationMatrix * Matrix_Scale(2.0f, 2.0f, 2.0f) *
                     Matrix_Rotate_X(3 * 3.141592f / 2.0f);
   for (const auto &part : m_Parts) {
     app.DrawObject(part.name.c_str(), part.object_id, model);

@@ -4,8 +4,7 @@
 #include "matrices.h"
 
 Projectile::Projectile(glm::vec4 position, glm::vec4 velocity)
-    : GameObject("the_sphere", LASER_BOLT, "projectile"),
-      m_Position(position),
+    : GameObject("the_sphere", LASER_BOLT, "projectile"), m_Position(position),
       m_Velocity(velocity) {}
 
 void Projectile::Update(float deltaTime) {

@@ -1,7 +1,5 @@
 #include "Application.h"
 #include <cstdio>
-#include <iostream>
-#include "matrices.h"
 
 // External function for automated correction
 void Correcao_KeyCallback(int key, int action, int mod);
@@ -12,7 +10,11 @@ void ErrorCallback(int error, const char *description) {
 }
 
 void KeyCallback(
-    GLFWwindow *window, int key, int scancode, int action, int mod
+    GLFWwindow *window,
+    int key,
+    int scancode,
+    int action,
+    int mod
 ) {
   auto app = static_cast<Application *>(glfwGetWindowUserPointer(window));
   if (app)

@@ -2,7 +2,6 @@
 #include "ObjectIds.h"
 #include "matrices.h"
 #include "opengl_utils.h"
-#include "scene.h"
 #include <algorithm>
 
 void Application::Render() {

@@ -1,16 +1,11 @@
 #include "Application.h"
-#include "ObjectIds.h"
 #include "matrices.h"
 #include "opengl_utils.h"
 #include "scene.h"
-// #include "utils.h"
 #include <algorithm>
-#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-// #include <iostream>
 
 // External function for automated correction
 void Correcao_KeyCallback(int key, int action, int mod);

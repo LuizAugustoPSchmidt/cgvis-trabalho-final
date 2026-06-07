@@ -28,8 +28,8 @@ static glm::vec4 CubicBezier(
 }
 
 Asteroid::Asteroid(glm::vec4 position, glm::vec4 scale, glm::mat4 rotation)
-    : GameObject("rock.001_rock.013", ASTEROID, "asteroid"), m_Position(position),
-      m_Scale(scale), m_Rotation(rotation) {}
+    : GameObject("rock.001_rock.013", ASTEROID, "asteroid"),
+      m_Position(position), m_Scale(scale), m_Rotation(rotation) {}
 
 void Asteroid::Update(float deltaTime) {
   m_CurveAngle += ASTEROID_CURVE_SPEED * m_Direction * deltaTime;
@@ -48,7 +48,9 @@ void Asteroid::Update(float deltaTime) {
 
   m_Position = asteroidPosition;
   m_ModelMatrix = Matrix_Translate(
-                      asteroidPosition.x, asteroidPosition.y, asteroidPosition.z
+                      asteroidPosition.x,
+                      asteroidPosition.y,
+                      asteroidPosition.z
                   ) *
                   Matrix_Rotate_Y(m_CurveAngle);
 }

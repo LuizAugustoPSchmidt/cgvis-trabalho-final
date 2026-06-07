@@ -1,6 +1,4 @@
 #include "Application.h"
-#include <algorithm>
-#include <iostream>
 
 bool Application::SpheresIntersect(
     glm::vec4 posA,
@@ -30,10 +28,14 @@ void Application::CheckCollisions() {
   }
 
   // 2. Projectiles vs Enemies
-  CheckCollisions(m_Player->GetProjectiles(), allEnemies, [](auto &proj, auto &enemy) {
-    proj->Kill();
-    enemy->TakeDamage(1);
-  });
+  CheckCollisions(
+      m_Player->GetProjectiles(),
+      allEnemies,
+      [](auto &proj, auto &enemy) {
+        proj->Kill();
+        enemy->TakeDamage(1);
+      }
+  );
 
   // 3. All Enemies vs Asteroids
   CheckCollisions(allEnemies, m_Asteroids, [](auto &s, auto &a) {

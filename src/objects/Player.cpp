@@ -2,8 +2,8 @@
 #include "Application.h"
 #include "ObjectIds.h"
 #include "matrices.h"
-#include <glad/glad.h>
 #include <algorithm>
+#include <glad/glad.h>
 
 constexpr float NORMAL_SPEED = 15.0f;
 constexpr float MAX_BOOST_SPEED = 45.0f;
@@ -14,8 +14,7 @@ Player::Player()
     : GameObject("spaceship", SPACESHIP_MATERIAL, "player"),
       m_Position(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
       m_Forward(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)),
-      m_Up(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)),
-      m_Speed(NORMAL_SPEED) {
+      m_Up(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)), m_Speed(NORMAL_SPEED) {
   m_Parts = {
       {"Cube", SPACESHIP_MATERIAL, true},
       {"Cube_motor_0", SPACESHIP_MOTOR, false},
@@ -94,11 +93,9 @@ void Player::Shoot() {
 }
 
 void Player::Render(Application &app) {
-  glm::mat4 model =
-      Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
-      Matrix_Rotate_Y(m_Theta) *
-      Matrix_Rotate_X(m_Phi) *
-      Matrix_Scale(0.1f, 0.1f, 0.1f);
+  glm::mat4 model = Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
+                    Matrix_Rotate_Y(m_Theta) * Matrix_Rotate_X(m_Phi) *
+                    Matrix_Scale(0.1f, 0.1f, 0.1f);
 
   for (const auto &part : m_Parts) {
     if (part.flip_normals) {
