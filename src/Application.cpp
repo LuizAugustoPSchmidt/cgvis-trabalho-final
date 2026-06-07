@@ -144,6 +144,7 @@ void Application::LoadAssets(int argc, char *argv[]) {
   LoadModel("../../data/tie-fighter/tie-fighter-model.obj", "tiefighter_");
   LoadModel("../../data/tie-defender/tie-defender-model.obj", "tiedefender_");
   LoadModel("../../data/tie-phantom/tie-phantom-model.obj", "tiephantom_");
+  LoadModel("../../data/others/projectile-model.obj", "laser_");
 
   m_Player = std::make_unique<Player>();
 
@@ -204,6 +205,10 @@ void Application::Run() {
   }
 }
 
+void Application::AddProjectile(std::unique_ptr<Projectile> projectile) {
+  m_Projectiles.push_back(std::move(projectile));
+}
+
 void Application::Update(float deltaTime) {
   m_Player->SetTheta(m_CameraTheta);
   m_Player->SetPhi(m_CameraPhi);
@@ -225,6 +230,10 @@ void Application::Update(float deltaTime) {
       ship->SetTarget(m_Player->GetPosition());
       ship->Update(deltaTime);
     }
+
+    // Update Projectiles
+    for (auto &p : m_Projectiles)
+      p->Update(deltaTime);
 
     if (!m_GameOver)
       CheckCollisions();
@@ -264,6 +273,7 @@ void Application::Cleanup() {
   cleanup(m_TieFighters);
   cleanup(m_TieDefenders);
   cleanup(m_TiePhantoms);
+  cleanup(m_Projectiles);
 
   if (m_TieFighters.empty() && m_TieDefenders.empty() && m_TiePhantoms.empty())
     m_Victory = true;

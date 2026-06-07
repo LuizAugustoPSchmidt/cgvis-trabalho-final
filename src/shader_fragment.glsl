@@ -76,6 +76,17 @@ uniform sampler2D TextureImage5;
 uniform sampler2D TextureImage6;
 uniform sampler2D TextureImage7;
 
+uniform vec3 projectile_color;
+
+struct ProjectileLight {
+    vec4 start;
+    vec4 end;
+    vec3 color;
+};
+
+uniform int num_projectile_lights;
+uniform ProjectileLight projectile_lights[10];
+
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
 
@@ -248,7 +259,7 @@ void main()
     }
     else if ( object_id == LASER_BOLT )
     {
-        Kd0 = vec3(0.0, 1.0, 0.1);
+        Kd0 = projectile_color;
     }
 
     // Equação de Iluminação
@@ -265,6 +276,32 @@ void main()
     else
     {
         vec3 diffuse_term = Kd0 * (star_diffuse_color * lambert + ambient);
+
+        // Contribution from Projectile Lights
+        for (int i = 0; i < num_projectile_lights; ++i)
+        {
+            vec4 A = projectile_lights[i].start;
+            vec4 B = projectile_lights[i].end;
+            vec3 light_color = projectile_lights[i].color;
+
+            // Closest point on segment AB to point p
+            vec4 AB = B - A;
+            float t = dot(p - A, AB) / dot(AB, AB);
+            t = clamp(t, 0.0, 1.0);
+            vec4 closest_point = A + t * AB;
+
+            vec4 L = closest_point - p;
+            float dist = length(L);
+            L = normalize(L);
+
+            float p_lambert = max(0.0, dot(n, L));
+            
+            // Attenuation
+            float attenuation = 1.0 / (dist * dist + 1.0);
+            
+            diffuse_term += Kd0 * light_color * p_lambert * attenuation * 20.0;
+        }
+
         vec3 specular_term = star_specular_color * Ks * blinn_phong_specular;
         color.rgb = diffuse_term + specular_term;
     }
