@@ -49,7 +49,7 @@ void Application::Render() {
 
   // Set Projectile Lights
   // In the future, collect from TIEs as well
-  int numLights = std::min((int)m_Projectiles.size(), 10);
+  int numLights = std::min((int)m_Projectiles.size(), 40);
   m_MainShader->SetInt("num_projectile_lights", numLights);
   for (int i = 0; i < numLights; ++i) {
     std::string base = "projectile_lights[" + std::to_string(i) + "].";

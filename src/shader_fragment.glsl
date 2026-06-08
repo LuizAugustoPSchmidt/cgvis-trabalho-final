@@ -85,7 +85,7 @@ struct ProjectileLight {
 };
 
 uniform int num_projectile_lights;
-uniform ProjectileLight projectile_lights[10];
+uniform ProjectileLight projectile_lights[40];
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
