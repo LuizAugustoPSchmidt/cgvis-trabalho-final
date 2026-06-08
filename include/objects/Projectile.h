@@ -25,7 +25,7 @@ private:
   glm::vec4 m_Velocity;
   glm::vec3 m_Color;
   float m_TimeAlive = 0.0f;
-  static constexpr float MAX_LIFETIME = 3.0f;
+  static constexpr float MAX_LIFETIME = 1.0f;
 };
 
 #endif // PROJECTILE_H
