@@ -73,6 +73,7 @@ void Application::Render() {
   TextRendering_ShowFramesPerSecond();
   TextRendering_ShowGameOver();
   TextRendering_ShowVictory();
+  TextRendering_ShowPauseScreen();
 }
 
 void Application::RenderMinimap() {

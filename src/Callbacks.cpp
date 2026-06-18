@@ -76,14 +76,29 @@ void Application::SetFramebufferSizeCallback() {
 // Callback Implementations
 void Application::KeyCallback(int key, int scancode, int action, int mod) {
   Correcao_KeyCallback(key, action, mod);
-  if ((key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q) && action == GLFW_PRESS)
-    glfwSetWindowShouldClose(m_Window, GL_TRUE);
 
   if (m_StartScreen) {
     if ((key == GLFW_KEY_SPACE || key == GLFW_KEY_ENTER) && action == GLFW_PRESS)
       m_StartScreen = false;
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+      glfwSetWindowShouldClose(m_Window, GL_TRUE);
     return;
   }
+
+  if (m_Paused) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+      m_Paused = false;
+    if (key == GLFW_KEY_R && action == GLFW_PRESS)
+      Reset();
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+      glfwSetWindowShouldClose(m_Window, GL_TRUE);
+    return;
+  }
+
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS && !m_GameOver && !m_Victory)
+    m_Paused = true;
+  if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+    glfwSetWindowShouldClose(m_Window, GL_TRUE);
 
   if (key == GLFW_KEY_C && action == GLFW_PRESS)
     m_CameraMode = (m_CameraMode == CameraMode::ThirdPerson)

@@ -277,6 +277,24 @@ void Application::Cleanup() {
     m_Victory = true;
 }
 
+void Application::Reset() {
+  m_GameOver = false;
+  m_Victory = false;
+  m_Paused = false;
+  m_StartScreen = false;
+  m_SpawnAngle = 0.0f;
+
+  m_Player = std::make_unique<Player>();
+
+  m_TieFighters.clear();
+  m_TieDefenders.clear();
+  m_TiePhantoms.clear();
+
+  SpawnSquadrons(6, 12, 100.0f, m_TieFighters);
+  SpawnSquadrons(3, 6, 150.0f, m_TiePhantoms);
+  SpawnSquadrons(2, 3, 200.0f, m_TieDefenders);
+}
+
 void Application::Shutdown() {
   if (m_Window) {
     glfwTerminate();

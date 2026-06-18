@@ -47,6 +47,59 @@ void Application::TextRendering_ShowStartScreen() {
   );
 }
 
+void Application::TextRendering_ShowPauseScreen() {
+  if (!m_Paused)
+    return;
+
+  float lineheight = TextRendering_LineHeight(m_Window);
+  float charwidth = TextRendering_CharWidth(m_Window);
+
+  const char *title = "PAUSADO";
+  int titleChars = 7;
+  float titleScale = 2.0f;
+  float xTitle = -(titleChars / 2.0f) * charwidth * titleScale;
+  float yTitle = 0.2f;
+  TextRendering_PrintString(
+      m_Window,
+      title,
+      xTitle,
+      yTitle,
+      titleScale,
+      glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
+  );
+
+  float yOpts = yTitle - lineheight * titleScale - lineheight * 2.0f;
+  float optScale = 1.0f;
+
+  const char *opt1 = "[ESC] Continuar";
+  TextRendering_PrintString(
+      m_Window,
+      opt1,
+      -(15 / 2.0f) * charwidth,
+      yOpts,
+      optScale,
+      glm::vec4(0.2f, 1.0f, 0.2f, 1.0f)
+  );
+  const char *opt2 = "[R] Reiniciar";
+  TextRendering_PrintString(
+      m_Window,
+      opt2,
+      -(13 / 2.0f) * charwidth,
+      yOpts - lineheight * 2.5f,
+      optScale,
+      glm::vec4(1.0f, 1.0f, 0.2f, 1.0f)
+  );
+  const char *opt3 = "[Q] Sair";
+  TextRendering_PrintString(
+      m_Window,
+      opt3,
+      -(8 / 2.0f) * charwidth,
+      yOpts - lineheight * 5.0f,
+      optScale,
+      glm::vec4(1.0f, 0.3f, 0.3f, 1.0f)
+  );
+}
+
 void Application::TextRendering_ShowFramesPerSecond() {
   if (!m_ShowInfoText)
     return;
