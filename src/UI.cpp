@@ -168,20 +168,27 @@ void Application::TextRendering_ShowGameOver() {
   if (!m_GameOver)
     return;
 
-  const char *msg = "GAME OVER";
-  int numchars = 9;
   float lineheight = TextRendering_LineHeight(m_Window);
   float charwidth = TextRendering_CharWidth(m_Window);
 
-  float x = -(numchars / 2.0f) * charwidth * 2.0f;
-  float y = 0.0f;
-
+  const char *msg = "GAME OVER";
+  float titleScale = 2.0f;
+  float yTitle = 0.2f;
   TextRendering_PrintString(
-      m_Window,
-      msg,
-      x,
-      y,
-      2.0f,
+      m_Window, msg, -(9 / 2.0f) * charwidth * titleScale, yTitle, titleScale,
       glm::vec4(1.0f, 0.2f, 0.2f, 1.0f)
+  );
+
+  float yOpts = yTitle - lineheight * titleScale - lineheight * 2.0f;
+
+  const char *opt1 = "[R] Reiniciar";
+  TextRendering_PrintString(
+      m_Window, opt1, -(13 / 2.0f) * charwidth, yOpts, 1.0f,
+      glm::vec4(1.0f, 1.0f, 0.2f, 1.0f)
+  );
+  const char *opt2 = "[Q] Sair";
+  TextRendering_PrintString(
+      m_Window, opt2, -(8 / 2.0f) * charwidth, yOpts - lineheight * 2.5f, 1.0f,
+      glm::vec4(1.0f, 0.3f, 0.3f, 1.0f)
   );
 }

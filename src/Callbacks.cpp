@@ -95,7 +95,15 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
     return;
   }
 
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS && !m_GameOver && !m_Victory)
+  if (m_GameOver) {
+    if (key == GLFW_KEY_R && action == GLFW_PRESS)
+      Reset();
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+      glfwSetWindowShouldClose(m_Window, GL_TRUE);
+    return;
+  }
+
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS && !m_Victory)
     m_Paused = true;
   if (key == GLFW_KEY_Q && action == GLFW_PRESS)
     glfwSetWindowShouldClose(m_Window, GL_TRUE);
