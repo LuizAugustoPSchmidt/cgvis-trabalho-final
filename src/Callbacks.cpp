@@ -79,6 +79,12 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
   if ((key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q) && action == GLFW_PRESS)
     glfwSetWindowShouldClose(m_Window, GL_TRUE);
 
+  if (m_StartScreen) {
+    if ((key == GLFW_KEY_SPACE || key == GLFW_KEY_ENTER) && action == GLFW_PRESS)
+      m_StartScreen = false;
+    return;
+  }
+
   if (key == GLFW_KEY_C && action == GLFW_PRESS)
     m_CameraMode = (m_CameraMode == CameraMode::ThirdPerson)
                        ? CameraMode::FirstPerson
@@ -122,6 +128,12 @@ void Application::KeyCallback(int key, int scancode, int action, int mod) {
 }
 
 void Application::MouseButtonCallback(int button, int action, int mods) {
+  if (m_StartScreen) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+      m_StartScreen = false;
+    return;
+  }
+
   if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
     glfwGetCursorPos(m_Window, &m_LastCursorPosX, &m_LastCursorPosY);
     m_LeftMouseButtonPressed = true;

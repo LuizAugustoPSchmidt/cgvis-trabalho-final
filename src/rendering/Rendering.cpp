@@ -50,6 +50,11 @@ void Application::Render() {
   glDepthMask(GL_TRUE);
   glEnable(GL_CULL_FACE);
 
+  if (m_StartScreen) {
+    TextRendering_ShowStartScreen();
+    return;
+  }
+
   // Render Game Objects
   m_Player->Render(*this);
   for (auto &proj : m_Player->GetProjectiles())

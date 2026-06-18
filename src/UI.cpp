@@ -2,6 +2,51 @@
 #include "opengl_utils.h"
 #include <cstdio>
 
+void Application::TextRendering_ShowStartScreen() {
+  float lineheight = TextRendering_LineHeight(m_Window);
+  float charwidth = TextRendering_CharWidth(m_Window);
+
+  const char *title = "CACA NAS ESTRELAS";
+  int titleChars = 17;
+  float titleScale = 2.0f;
+  float xTitle = -(titleChars / 2.0f) * charwidth * titleScale;
+  float yTitle = 0.25f;
+  TextRendering_PrintString(
+      m_Window,
+      title,
+      xTitle,
+      yTitle,
+      titleScale,
+      glm::vec4(1.0f, 1.0f, 0.2f, 1.0f)
+  );
+
+  const char *prompt = "Pressione ESPACO ou clique para comecar";
+  int promptChars = 38;
+  float xPrompt = -(promptChars / 2.0f) * charwidth;
+  float yPrompt = yTitle - lineheight * titleScale - lineheight * 2.0f;
+  TextRendering_PrintString(
+      m_Window,
+      prompt,
+      xPrompt,
+      yPrompt,
+      1.0f,
+      glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
+  );
+
+  const char *controls = "Mover: mouse   Boost: W   Atirar: ESPACO   Camera: C";
+  int controlsChars = 51;
+  float xControls = -(controlsChars / 2.0f) * charwidth;
+  float yControls = yPrompt - lineheight * 4.0f;
+  TextRendering_PrintString(
+      m_Window,
+      controls,
+      xControls,
+      yControls,
+      1.0f,
+      glm::vec4(0.7f, 0.7f, 0.7f, 1.0f)
+  );
+}
+
 void Application::TextRendering_ShowFramesPerSecond() {
   if (!m_ShowInfoText)
     return;

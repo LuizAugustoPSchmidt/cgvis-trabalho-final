@@ -210,6 +210,9 @@ void Application::Run() {
 }
 
 void Application::Update(float deltaTime) {
+  if (m_StartScreen)
+    return;
+
   m_Player->SetTheta(m_CameraTheta);
   m_Player->SetPhi(m_CameraPhi);
   m_Player->UpdateOrientation();

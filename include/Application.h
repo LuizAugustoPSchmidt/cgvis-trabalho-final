@@ -96,6 +96,7 @@ private:
   std::vector<std::unique_ptr<TiePhantom>> m_TiePhantoms;
 
   // Game State
+  bool m_StartScreen = true;
   bool m_GameOver = false;
   bool m_Victory = false;
   bool m_Paused = false;
@@ -134,6 +135,7 @@ private:
   void TextRendering_ShowFramesPerSecond();
   void TextRendering_ShowGameOver();
   void TextRendering_ShowVictory();
+  void TextRendering_ShowStartScreen();
 
   void LoadModel(const char *path, const std::string &prefix = "");
 
