@@ -69,8 +69,6 @@ private:
 
   // Input State
   bool m_LeftMouseButtonPressed = false;
-  bool m_RightMouseButtonPressed = false;
-  bool m_MiddleMouseButtonPressed = false;
   bool m_InvertY = true;
   double m_LastCursorPosX = 0.0, m_LastCursorPosY = 0.0;
 
@@ -108,11 +106,6 @@ private:
 #if !RELEASE
   float m_DebugZoom = 1.0f;
 #endif
-  float m_ForearmAngleZ = 0.0f;
-  float m_ForearmAngleX = 0.0f;
-  float m_TorsoPositionX = 0.0f;
-  float m_TorsoPositionY = 0.0f;
-
   // OpenGL Resources (RAII)
   std::unique_ptr<Shader> m_MainShader;
   GLuint m_LineVAO = 0;

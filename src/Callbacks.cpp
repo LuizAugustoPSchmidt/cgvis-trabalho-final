@@ -164,20 +164,7 @@ void Application::MouseButtonCallback(int button, int action, int mods) {
   if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
     m_LeftMouseButtonPressed = false;
   }
-  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-    glfwGetCursorPos(m_Window, &m_LastCursorPosX, &m_LastCursorPosY);
-    m_RightMouseButtonPressed = true;
-  }
-  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
-    m_RightMouseButtonPressed = false;
-  }
-  if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
-    glfwGetCursorPos(m_Window, &m_LastCursorPosX, &m_LastCursorPosY);
-    m_MiddleMouseButtonPressed = true;
-  }
-  if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE) {
-    m_MiddleMouseButtonPressed = false;
-  }
+
 }
 
 void Application::CursorPosCallback(double xpos, double ypos) {
@@ -200,22 +187,7 @@ void Application::CursorPosCallback(double xpos, double ypos) {
     m_LastCursorPosX = xpos;
     m_LastCursorPosY = ypos;
   }
-  if (m_RightMouseButtonPressed) {
-    float dx = xpos - m_LastCursorPosX;
-    float dy = ypos - m_LastCursorPosY;
-    m_ForearmAngleZ -= 0.01f * dx;
-    m_ForearmAngleX += 0.01f * dy;
-    m_LastCursorPosX = xpos;
-    m_LastCursorPosY = ypos;
-  }
-  if (m_MiddleMouseButtonPressed) {
-    float dx = xpos - m_LastCursorPosX;
-    float dy = ypos - m_LastCursorPosY;
-    m_TorsoPositionX += 0.01f * dx;
-    m_TorsoPositionY -= 0.01f * dy;
-    m_LastCursorPosX = xpos;
-    m_LastCursorPosY = ypos;
-  }
+
 }
 
 void Application::ScrollCallback(double xoffset, double yoffset) {
