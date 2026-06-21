@@ -31,31 +31,42 @@ static glm::vec4 CubicBezier(
 Asteroid::Asteroid(glm::vec4 position, glm::vec4 scale, glm::mat4 rotation)
     : GameObject("rock.001_rock.013", ASTEROID, "asteroid"),
       m_Position(position), m_Scale(scale), m_Rotation(rotation) {
-  // Generate random Bezier path around position
+  // Generate random Bezier path around position (Curve 1)
   m_P0 = position;
   m_P1 = position + glm::vec4(float(rand() % 40 - 20), float(rand() % 40 - 20), float(rand() % 40 - 20), 0.0f);
   m_P2 = position + glm::vec4(float(rand() % 40 - 20), float(rand() % 40 - 20), float(rand() % 40 - 20), 0.0f);
   m_P3 = position + glm::vec4(float(rand() % 40 - 20), float(rand() % 40 - 20), float(rand() % 40 - 20), 0.0f);
 
+  // Constraint-based control points for C1 continuity (velocity matching)
+  m_P1_c2 = 2.0f * m_P3 - m_P2;
+  m_P2_c2 = 2.0f * m_P0 - m_P1;
+
   // Randomize initial curve angle and speed/direction
   m_CurveAngle = static_cast<float>(rand() % 100) / 100.0f * TWO_PI;
   m_Direction = (rand() % 2 == 0) ? 1.0f : -1.0f;
+
+  // Randomize initial path progression and curve choice
+  m_T = static_cast<float>(rand() % 100) / 100.0f;
+  m_OnCurve1 = (rand() % 2 == 0);
 }
 
 void Asteroid::Update(float deltaTime) {
+  // Keep rotating the asteroid smoothly
   m_CurveAngle += ASTEROID_CURVE_SPEED * m_Direction * deltaTime;
 
-  float asteroidCurveTime =
-      ASTEROID_CURVE_T_AMPLITUDE *
-      (sin(m_CurveAngle - HALF_PI) + ASTEROID_CURVE_T_OFFSET);
+  // Advance along the Bezier curve loop (approx. 6.6s per curve)
+  m_T += 0.15f * deltaTime;
+  if (m_T >= 1.0f) {
+    m_T = fmod(m_T, 1.0f);
+    m_OnCurve1 = !m_OnCurve1;
+  }
 
-  glm::vec4 asteroidPosition = CubicBezier(
-      m_P0,
-      m_P1,
-      m_P2,
-      m_P3,
-      asteroidCurveTime
-  );
+  glm::vec4 asteroidPosition;
+  if (m_OnCurve1) {
+    asteroidPosition = CubicBezier(m_P0, m_P1, m_P2, m_P3, m_T);
+  } else {
+    asteroidPosition = CubicBezier(m_P3, m_P1_c2, m_P2_c2, m_P0, m_T);
+  }
 
   m_Position = asteroidPosition;
   m_ModelMatrix = Matrix_Translate(

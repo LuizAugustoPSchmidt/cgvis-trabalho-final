@@ -148,8 +148,7 @@ void Application::LoadAssets(int argc, char *argv[]) {
 
   m_Player = std::make_unique<Player>();
 
-  // Spawn 40 unique, random asteroids in a sphere
-  for (int i = 0; i < 40; ++i) {
+  for (int i = 0; i < 80; ++i) {
     float r = 30.0f + static_cast<float>(rand() % 170); // 30 to 200 units away
     float theta = static_cast<float>(rand() % 100) / 100.0f * 2.0f * 3.14159f;
     float phi = static_cast<float>(rand() % 100) / 100.0f * 3.14159f;
@@ -166,13 +165,19 @@ void Application::LoadAssets(int argc, char *argv[]) {
     glm::vec4 scale(s, s, s, 0.0f);
 
     // Random rotation
-    float rotAngle = static_cast<float>(rand() % 100) / 100.0f * 2.0f * 3.14159f;
-    glm::mat4 rotation = Matrix_Rotate(rotAngle, glm::normalize(glm::vec4(
-        static_cast<float>(rand() % 10 - 5),
-        static_cast<float>(rand() % 10 - 5),
-        static_cast<float>(rand() % 10 - 5),
-        0.0f
-    )));
+    float rotAngle =
+        static_cast<float>(rand() % 100) / 100.0f * 2.0f * 3.14159f;
+    glm::mat4 rotation = Matrix_Rotate(
+        rotAngle,
+        glm::normalize(
+            glm::vec4(
+                static_cast<float>(rand() % 10 - 5),
+                static_cast<float>(rand() % 10 - 5),
+                static_cast<float>(rand() % 10 - 5),
+                0.0f
+            )
+        )
+    );
 
     m_Asteroids.push_back(std::make_unique<Asteroid>(pos, scale, rotation));
   }
@@ -335,22 +340,24 @@ std::vector<GameObject *> Application::GetHarmfulObjects() {
 void Application::CreateMinimapTriangle() {
   // Flat unit equilateral triangle in XZ plane pointing along +Z
   std::vector<float> positions = {
-      0.0f, 0.0f, 1.0f, 1.0f,         // 0: Tip
-      -0.866025f, 0.0f, -0.5f, 1.0f,  // 1: Left
-      0.866025f, 0.0f, -0.5f, 1.0f    // 2: Right
+      0.0f,
+      0.0f,
+      1.0f,
+      1.0f, // 0: Tip
+      -0.866025f,
+      0.0f,
+      -0.5f,
+      1.0f, // 1: Left
+      0.866025f,
+      0.0f,
+      -0.5f,
+      1.0f // 2: Right
   };
 
-  std::vector<float> normals = {
-      0.0f, 1.0f, 0.0f, 0.0f,
-      0.0f, 1.0f, 0.0f, 0.0f,
-      0.0f, 1.0f, 0.0f, 0.0f
-  };
+  std::vector<float> normals =
+      {0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
 
-  std::vector<float> texcoords = {
-      0.5f, 1.0f,
-      0.0f, 0.0f,
-      1.0f, 0.0f
-  };
+  std::vector<float> texcoords = {0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f};
 
   std::vector<unsigned int> indices = {0, 2, 1};
 
@@ -358,14 +365,20 @@ void Application::CreateMinimapTriangle() {
   glGenVertexArrays(1, &vao_id);
   glBindVertexArray(vao_id);
 
-  auto upload_vbo = [](GLuint location, GLint size, const std::vector<float> &data) {
-    GLuint vbo_id;
-    glGenBuffers(1, &vbo_id);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(location);
-  };
+  auto upload_vbo =
+      [](GLuint location, GLint size, const std::vector<float> &data) {
+        GLuint vbo_id;
+        glGenBuffers(1, &vbo_id);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            data.size() * sizeof(float),
+            data.data(),
+            GL_STATIC_DRAW
+        );
+        glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(location);
+      };
 
   upload_vbo(0, 4, positions);
   upload_vbo(1, 4, normals);
@@ -374,7 +387,12 @@ void Application::CreateMinimapTriangle() {
   GLuint ebo_id;
   glGenBuffers(1, &ebo_id);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+  glBufferData(
+      GL_ELEMENT_ARRAY_BUFFER,
+      indices.size() * sizeof(unsigned int),
+      indices.data(),
+      GL_STATIC_DRAW
+  );
 
   glBindVertexArray(0);
 

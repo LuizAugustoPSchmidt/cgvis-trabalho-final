@@ -31,6 +31,13 @@ private:
   glm::vec4 m_P1;
   glm::vec4 m_P2;
   glm::vec4 m_P3;
+
+  // Control points for the second Bezier curve (starts at m_P3, ends at m_P0)
+  glm::vec4 m_P1_c2;
+  glm::vec4 m_P2_c2;
+
+  bool m_OnCurve1 = true;
+  float m_T = 0.0f;
 };
 
 #endif // ASTEROID_H
