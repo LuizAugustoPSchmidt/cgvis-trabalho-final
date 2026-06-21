@@ -3,6 +3,9 @@
 
 // Squad Spawning Constants
 constexpr float SQUAD_SPAWN_RADIUS = 10.0f;
+constexpr float SQUAD_REPULSION_THRESHOLD = 40.0f;
+constexpr float SQUAD_REPULSION_WEIGHT = 200.0f;
+constexpr float SQUAD_ATTRACTION_WEIGHT = 8.0f;
 
 // Minimap Blip Scales
 constexpr float MINIMAP_PLAYER_BLIP_SIZE = 10.0f;

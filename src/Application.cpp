@@ -235,18 +235,23 @@ void Application::Update(float deltaTime) {
     m_Player->Update(deltaTime);
     for (auto &asteroid : m_Asteroids)
       asteroid->Update(deltaTime);
+    std::vector<glm::vec4> squadPositions;
+    for (auto &squad : m_FighterSquads) squadPositions.push_back(squad.GetPosition());
+    for (auto &squad : m_DefenderSquads) squadPositions.push_back(squad.GetPosition());
+    for (auto &squad : m_PhantomSquads) squadPositions.push_back(squad.GetPosition());
+
     for (auto &squad : m_FighterSquads)
-      squad.Coordinate(deltaTime, m_Player->GetPosition());
+      squad.Coordinate(deltaTime, m_Player->GetPosition(), squadPositions);
     for (auto &ship : m_TieFighters) {
       ship->Update(deltaTime, *this);
     }
     for (auto &squad : m_DefenderSquads)
-      squad.Coordinate(deltaTime, m_Player->GetPosition());
+      squad.Coordinate(deltaTime, m_Player->GetPosition(), squadPositions);
     for (auto &ship : m_TieDefenders) {
       ship->Update(deltaTime, *this);
     }
     for (auto &squad : m_PhantomSquads)
-      squad.Coordinate(deltaTime, m_Player->GetPosition());
+      squad.Coordinate(deltaTime, m_Player->GetPosition(), squadPositions);
     for (auto &ship : m_TiePhantoms) {
       ship->Update(deltaTime, *this);
     }
