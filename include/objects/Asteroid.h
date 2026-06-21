@@ -15,7 +15,7 @@ public:
 
   float GetCurveAngle() const { return m_CurveAngle; }
   virtual glm::vec4 GetPosition() const override { return m_Position; }
-  virtual float GetRadius() const override { return 2.0f; }
+  virtual float GetRadius() const override { return 2.0f * m_Scale.x; }
   void ReverseDirection() { m_Direction = -m_Direction; }
 
 private:
@@ -25,6 +25,12 @@ private:
   float m_CurveAngle = 0.0f;
   float m_Direction = 1.0f;
   glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
+
+  // Unique Bezier control points for this asteroid
+  glm::vec4 m_P0;
+  glm::vec4 m_P1;
+  glm::vec4 m_P2;
+  glm::vec4 m_P3;
 };
 
 #endif // ASTEROID_H

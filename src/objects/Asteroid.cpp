@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ObjectIds.h"
 #include "matrices.h"
+#include <cstdlib>
 
 constexpr float PI = 3.141592f;
 constexpr float TWO_PI = 2.0f * PI;
@@ -29,7 +30,17 @@ static glm::vec4 CubicBezier(
 
 Asteroid::Asteroid(glm::vec4 position, glm::vec4 scale, glm::mat4 rotation)
     : GameObject("rock.001_rock.013", ASTEROID, "asteroid"),
-      m_Position(position), m_Scale(scale), m_Rotation(rotation) {}
+      m_Position(position), m_Scale(scale), m_Rotation(rotation) {
+  // Generate random Bezier path around position
+  m_P0 = position;
+  m_P1 = position + glm::vec4(float(rand() % 40 - 20), float(rand() % 40 - 20), float(rand() % 40 - 20), 0.0f);
+  m_P2 = position + glm::vec4(float(rand() % 40 - 20), float(rand() % 40 - 20), float(rand() % 40 - 20), 0.0f);
+  m_P3 = position + glm::vec4(float(rand() % 40 - 20), float(rand() % 40 - 20), float(rand() % 40 - 20), 0.0f);
+
+  // Randomize initial curve angle and speed/direction
+  m_CurveAngle = static_cast<float>(rand() % 100) / 100.0f * TWO_PI;
+  m_Direction = (rand() % 2 == 0) ? 1.0f : -1.0f;
+}
 
 void Asteroid::Update(float deltaTime) {
   m_CurveAngle += ASTEROID_CURVE_SPEED * m_Direction * deltaTime;
@@ -39,10 +50,10 @@ void Asteroid::Update(float deltaTime) {
       (sin(m_CurveAngle - HALF_PI) + ASTEROID_CURVE_T_OFFSET);
 
   glm::vec4 asteroidPosition = CubicBezier(
-      ASTEROID_CURVE_P0,
-      ASTEROID_CURVE_P1,
-      ASTEROID_CURVE_P2,
-      ASTEROID_CURVE_P3,
+      m_P0,
+      m_P1,
+      m_P2,
+      m_P3,
       asteroidCurveTime
   );
 
@@ -52,7 +63,9 @@ void Asteroid::Update(float deltaTime) {
                       asteroidPosition.y,
                       asteroidPosition.z
                   ) *
-                  Matrix_Rotate_Y(m_CurveAngle);
+                  m_Rotation *
+                  Matrix_Rotate_Y(m_CurveAngle) *
+                  Matrix_Scale(m_Scale.x, m_Scale.y, m_Scale.z);
 }
 
 void Asteroid::Render(Application &app) {

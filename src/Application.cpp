@@ -148,29 +148,34 @@ void Application::LoadAssets(int argc, char *argv[]) {
 
   m_Player = std::make_unique<Player>();
 
-  m_Asteroids.push_back(
-      std::make_unique<Asteroid>(glm::vec4(15.0f, 2.0f, -20.0f, 1.0f))
-  );
-  m_Asteroids.push_back(
-      std::make_unique<Asteroid>(
-          glm::vec4(-25.0f, 10.0f, -30.0f, 1.0f),
-          glm::vec4(1.0f, 1.0f, 1.0f, 0.0f),
-          Matrix_Rotate_Y(1.0f)
-      )
-  );
-  m_Asteroids.push_back(
-      std::make_unique<Asteroid>(
-          glm::vec4(5.0f, -15.0f, -45.0f, 1.0f),
-          glm::vec4(2.5f, 2.5f, 2.5f, 0.0f)
-      )
-  );
-  m_Asteroids.push_back(
-      std::make_unique<Asteroid>(
-          glm::vec4(-35.0f, -5.0f, 10.0f, 1.0f),
-          glm::vec4(1.0f, 1.0f, 1.0f, 0.0f),
-          Matrix_Rotate_X(0.5f)
-      )
-  );
+  // Spawn 40 unique, random asteroids in a sphere
+  for (int i = 0; i < 40; ++i) {
+    float r = 30.0f + static_cast<float>(rand() % 170); // 30 to 200 units away
+    float theta = static_cast<float>(rand() % 100) / 100.0f * 2.0f * 3.14159f;
+    float phi = static_cast<float>(rand() % 100) / 100.0f * 3.14159f;
+
+    glm::vec4 pos(
+        r * sin(phi) * cos(theta),
+        r * sin(phi) * sin(theta),
+        r * cos(phi),
+        1.0f
+    );
+
+    // Random scale between 0.5 and 3.0
+    float s = 0.5f + static_cast<float>(rand() % 250) / 100.0f;
+    glm::vec4 scale(s, s, s, 0.0f);
+
+    // Random rotation
+    float rotAngle = static_cast<float>(rand() % 100) / 100.0f * 2.0f * 3.14159f;
+    glm::mat4 rotation = Matrix_Rotate(rotAngle, glm::normalize(glm::vec4(
+        static_cast<float>(rand() % 10 - 5),
+        static_cast<float>(rand() % 10 - 5),
+        static_cast<float>(rand() % 10 - 5),
+        0.0f
+    )));
+
+    m_Asteroids.push_back(std::make_unique<Asteroid>(pos, scale, rotation));
+  }
 
   // Spawn TIE Squadrons
   SpawnSquadrons(6, 12, 100.0f, m_TieFighters); // 6 squads of 12 Fighters
