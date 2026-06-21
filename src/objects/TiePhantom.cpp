@@ -4,6 +4,7 @@
 #include "glm/geometric.hpp"
 #include "matrices.h"
 #include "objects/Projectile.h"
+#include "TiePhantom.constants.h"
 #include <cstdlib>
 
 constexpr float ACCELERATION_MAX = 10.0f;
@@ -20,7 +21,7 @@ TiePhantom::TiePhantom(glm::vec4 position)
       {"tiephantom_mat4", TIE_PHANTOM_WINGS},
       {"tiephantom_mat5", TIE_PHANTOM_WINGS},
   };
-  m_ShootCooldown = static_cast<float>(rand() % 100) / 100.0f * 2.5f;
+  m_ShootCooldown = static_cast<float>(rand() % 100) / 100.0f * TIE_PHANTOM_COOLDOWN;
 }
 
 void TiePhantom::Update(float deltaTime) {
@@ -75,9 +76,9 @@ void TiePhantom::Update(float deltaTime, Application &app) {
   m_ShootCooldown -= deltaTime;
   if (m_ShootCooldown <= 0.0f) {
     float dist = glm::length(m_Position - m_Target);
-    if (dist < 120.0f) {
+    if (dist < TIE_PHANTOM_SHOOT_RANGE) {
       Shoot(app);
-      m_ShootCooldown = 2.5f; // Slower fire rate for TIE Phantom
+      m_ShootCooldown = TIE_PHANTOM_COOLDOWN;
     }
   }
 }
@@ -88,11 +89,11 @@ void TiePhantom::Shoot(Application &app) {
   glm::vec4 right = glm::normalize(crossproduct(forward, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)));
 
   float speed = glm::length(m_Velocity);
-  glm::vec4 velocity = forward * (speed + 80.0f);
+  glm::vec4 velocity = forward * (speed + TIE_PHANTOM_SPEED_OFFSET);
 
   // Spawn left and right lasers
-  glm::vec4 spawnPosLeft = m_Position - right * 0.8f + forward * 2.0f;
-  glm::vec4 spawnPosRight = m_Position + right * 0.8f + forward * 2.0f;
+  glm::vec4 spawnPosLeft = m_Position - right * TIE_PHANTOM_LASER_OFFSET_X + forward * TIE_PHANTOM_LASER_OFFSET_Z;
+  glm::vec4 spawnPosRight = m_Position + right * TIE_PHANTOM_LASER_OFFSET_X + forward * TIE_PHANTOM_LASER_OFFSET_Z;
 
   app.AddProjectile(std::make_unique<Projectile>(
       spawnPosLeft,

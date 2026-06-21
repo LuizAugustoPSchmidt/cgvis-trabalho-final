@@ -2,6 +2,7 @@
 #include "ObjectIds.h"
 #include "matrices.h"
 #include "opengl_utils.h"
+#include "Application.constants.h"
 #include <algorithm>
 
 void Application::Render() {
@@ -132,7 +133,7 @@ void Application::RenderMinimap() {
   glClear(GL_DEPTH_BUFFER_BIT);
 
   // Player blip
-  DrawTriangleBlip(playerPos, m_Player->GetForward(), DEBUG_VECTOR_GREEN, 10.0f);
+  DrawTriangleBlip(playerPos, m_Player->GetForward(), DEBUG_VECTOR_GREEN, MINIMAP_PLAYER_BLIP_SIZE);
 
   // Enemy blips
   for (const auto &ship : m_TieFighters)
@@ -140,21 +141,21 @@ void Application::RenderMinimap() {
         ship->GetPosition(),
         ship->GetForward(),
         DEBUG_VECTOR_RED,
-        5.0f
+        MINIMAP_ENEMY_BLIP_SIZE
     );
   for (const auto &ship : m_TieDefenders)
     DrawTriangleBlip(
         ship->GetPosition(),
         ship->GetForward(),
         DEBUG_VECTOR_RED,
-        5.0f
+        MINIMAP_ENEMY_BLIP_SIZE
     );
   for (const auto &ship : m_TiePhantoms)
     DrawTriangleBlip(
         ship->GetPosition(),
         ship->GetForward(),
         DEBUG_VECTOR_RED,
-        5.0f
+        MINIMAP_ENEMY_BLIP_SIZE
     );
 
   // 5. Restore Main Viewport

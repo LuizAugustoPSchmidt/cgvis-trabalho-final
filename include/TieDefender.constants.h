@@ -1,0 +1,10 @@
+#ifndef TIEDEFENDER_CONSTANTS_H
+#define TIEDEFENDER_CONSTANTS_H
+
+constexpr float TIE_DEFENDER_SHOOT_RANGE = 120.0f;
+constexpr float TIE_DEFENDER_COOLDOWN = 1.2f;
+constexpr float TIE_DEFENDER_LASER_OFFSET_X = 0.6f;
+constexpr float TIE_DEFENDER_LASER_OFFSET_Z = 1.5f;
+constexpr float TIE_DEFENDER_SPEED_OFFSET = 80.0f;
+
+#endif // TIEDEFENDER_CONSTANTS_H

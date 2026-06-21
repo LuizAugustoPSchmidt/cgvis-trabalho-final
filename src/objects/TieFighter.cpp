@@ -4,6 +4,7 @@
 #include "glm/geometric.hpp"
 #include "matrices.h"
 #include "objects/Projectile.h"
+#include "TieFighter.constants.h"
 #include <cstdlib>
 
 constexpr float ACCELERATION_MAX = 10.0f;
@@ -16,7 +17,7 @@ TieFighter::TieFighter(glm::vec4 position)
           "tie-fighter"
       ),
       m_Position(position) {
-  m_ShootCooldown = static_cast<float>(rand() % 100) / 100.0f * 2.0f;
+  m_ShootCooldown = static_cast<float>(rand() % 100) / 100.0f * TIE_FIGHTER_COOLDOWN;
 }
 
 void TieFighter::Update(float deltaTime) {
@@ -65,9 +66,9 @@ void TieFighter::Update(float deltaTime, Application &app) {
   m_ShootCooldown -= deltaTime;
   if (m_ShootCooldown <= 0.0f) {
     float dist = glm::length(m_Position - m_Target);
-    if (dist < 120.0f) {
+    if (dist < TIE_FIGHTER_SHOOT_RANGE) {
       Shoot(app);
-      m_ShootCooldown = 2.0f;
+      m_ShootCooldown = TIE_FIGHTER_COOLDOWN;
     }
   }
 }
@@ -78,11 +79,11 @@ void TieFighter::Shoot(Application &app) {
   glm::vec4 right = glm::normalize(crossproduct(forward, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)));
 
   float speed = glm::length(m_Velocity);
-  glm::vec4 velocity = forward * (speed + 80.0f);
+  glm::vec4 velocity = forward * (speed + TIE_FIGHTER_SPEED_OFFSET);
 
   // Spawn left and right lasers
-  glm::vec4 spawnPosLeft = m_Position - right * 0.4f + forward * 1.0f;
-  glm::vec4 spawnPosRight = m_Position + right * 0.4f + forward * 1.0f;
+  glm::vec4 spawnPosLeft = m_Position - right * TIE_FIGHTER_LASER_OFFSET_X + forward * TIE_FIGHTER_LASER_OFFSET_Z;
+  glm::vec4 spawnPosRight = m_Position + right * TIE_FIGHTER_LASER_OFFSET_X + forward * TIE_FIGHTER_LASER_OFFSET_Z;
 
   app.AddProjectile(std::make_unique<Projectile>(
       spawnPosLeft,

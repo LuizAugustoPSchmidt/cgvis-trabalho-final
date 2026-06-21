@@ -2,6 +2,8 @@
 #include "matrices.h"
 #include "opengl_utils.h"
 #include "scene.h"
+#include "Asteroid.constants.h"
+#include "Application.constants.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
@@ -148,8 +150,8 @@ void Application::LoadAssets(int argc, char *argv[]) {
 
   m_Player = std::make_unique<Player>();
 
-  for (int i = 0; i < 80; ++i) {
-    float r = 30.0f + static_cast<float>(rand() % 170); // 30 to 200 units away
+  for (int i = 0; i < ASTEROID_SPAWN_COUNT; ++i) {
+    float r = ASTEROID_MIN_SPAWN_DIST + static_cast<float>(rand() % static_cast<int>(ASTEROID_MAX_SPAWN_DIST - ASTEROID_MIN_SPAWN_DIST)); // Spawn distance
     float theta = static_cast<float>(rand() % 100) / 100.0f * 2.0f * 3.14159f;
     float phi = static_cast<float>(rand() % 100) / 100.0f * 3.14159f;
 
@@ -160,8 +162,8 @@ void Application::LoadAssets(int argc, char *argv[]) {
         1.0f
     );
 
-    // Random scale between 0.5 and 3.0
-    float s = 0.5f + static_cast<float>(rand() % 250) / 100.0f;
+    // Random scale
+    float s = ASTEROID_MIN_SCALE + static_cast<float>(rand() % static_cast<int>((ASTEROID_MAX_SCALE - ASTEROID_MIN_SCALE) * 100.0f)) / 100.0f;
     glm::vec4 scale(s, s, s, 0.0f);
 
     // Random rotation
@@ -183,9 +185,9 @@ void Application::LoadAssets(int argc, char *argv[]) {
   }
 
   // Spawn TIE Squadrons
-  SpawnSquadrons(6, 12, 100.0f, m_TieFighters); // 6 squads of 12 Fighters
-  SpawnSquadrons(3, 6, 150.0f, m_TiePhantoms);  // 3 squads of 6 Phantoms
-  SpawnSquadrons(2, 3, 200.0f, m_TieDefenders); // 2 squads of 3 Defenders
+  SpawnSquadrons(TIE_FIGHTER_SQUADRONS, TIE_FIGHTER_SQUADRON_SIZE, TIE_FIGHTER_SQUADRON_DIST, m_TieFighters);
+  SpawnSquadrons(TIE_PHANTOM_SQUADRONS, TIE_PHANTOM_SQUADRON_SIZE, TIE_PHANTOM_SQUADRON_DIST, m_TiePhantoms);
+  SpawnSquadrons(TIE_DEFENDER_SQUADRONS, TIE_DEFENDER_SQUADRON_SIZE, TIE_DEFENDER_SQUADRON_DIST, m_TieDefenders);
 
   if (argc > 1) {
     LoadModel(argv[1]);

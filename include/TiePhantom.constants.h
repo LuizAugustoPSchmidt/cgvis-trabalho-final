@@ -1,0 +1,10 @@
+#ifndef TIEPHANTOM_CONSTANTS_H
+#define TIEPHANTOM_CONSTANTS_H
+
+constexpr float TIE_PHANTOM_SHOOT_RANGE = 120.0f;
+constexpr float TIE_PHANTOM_COOLDOWN = 2.5f;
+constexpr float TIE_PHANTOM_LASER_OFFSET_X = 0.8f;
+constexpr float TIE_PHANTOM_LASER_OFFSET_Z = 2.0f;
+constexpr float TIE_PHANTOM_SPEED_OFFSET = 80.0f;
+
+#endif // TIEPHANTOM_CONSTANTS_H

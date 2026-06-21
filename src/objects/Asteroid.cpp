@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ObjectIds.h"
 #include "matrices.h"
+#include "Asteroid.constants.h"
 #include <cstdlib>
 
 constexpr float PI = 3.141592f;
@@ -33,9 +34,24 @@ Asteroid::Asteroid(glm::vec4 position, glm::vec4 scale, glm::mat4 rotation)
       m_Position(position), m_Scale(scale), m_Rotation(rotation) {
   // Generate random Bezier path around position (Curve 1)
   m_P0 = position;
-  m_P1 = position + glm::vec4(float(rand() % 40 - 20), float(rand() % 40 - 20), float(rand() % 40 - 20), 0.0f);
-  m_P2 = position + glm::vec4(float(rand() % 40 - 20), float(rand() % 40 - 20), float(rand() % 40 - 20), 0.0f);
-  m_P3 = position + glm::vec4(float(rand() % 40 - 20), float(rand() % 40 - 20), float(rand() % 40 - 20), 0.0f);
+  m_P1 = position + glm::vec4(
+      static_cast<float>(rand() % static_cast<int>(2.0f * ASTEROID_RANDOM_OFFSET) - ASTEROID_RANDOM_OFFSET),
+      static_cast<float>(rand() % static_cast<int>(2.0f * ASTEROID_RANDOM_OFFSET) - ASTEROID_RANDOM_OFFSET),
+      static_cast<float>(rand() % static_cast<int>(2.0f * ASTEROID_RANDOM_OFFSET) - ASTEROID_RANDOM_OFFSET),
+      0.0f
+  );
+  m_P2 = position + glm::vec4(
+      static_cast<float>(rand() % static_cast<int>(2.0f * ASTEROID_RANDOM_OFFSET) - ASTEROID_RANDOM_OFFSET),
+      static_cast<float>(rand() % static_cast<int>(2.0f * ASTEROID_RANDOM_OFFSET) - ASTEROID_RANDOM_OFFSET),
+      static_cast<float>(rand() % static_cast<int>(2.0f * ASTEROID_RANDOM_OFFSET) - ASTEROID_RANDOM_OFFSET),
+      0.0f
+  );
+  m_P3 = position + glm::vec4(
+      static_cast<float>(rand() % static_cast<int>(2.0f * ASTEROID_RANDOM_OFFSET) - ASTEROID_RANDOM_OFFSET),
+      static_cast<float>(rand() % static_cast<int>(2.0f * ASTEROID_RANDOM_OFFSET) - ASTEROID_RANDOM_OFFSET),
+      static_cast<float>(rand() % static_cast<int>(2.0f * ASTEROID_RANDOM_OFFSET) - ASTEROID_RANDOM_OFFSET),
+      0.0f
+  );
 
   // Constraint-based control points for C1 continuity (velocity matching)
   m_P1_c2 = 2.0f * m_P3 - m_P2;
@@ -54,8 +70,8 @@ void Asteroid::Update(float deltaTime) {
   // Keep rotating the asteroid smoothly
   m_CurveAngle += ASTEROID_CURVE_SPEED * m_Direction * deltaTime;
 
-  // Advance along the Bezier curve loop (approx. 6.6s per curve)
-  m_T += 0.15f * deltaTime;
+  // Advance along the Bezier curve loop
+  m_T += ASTEROID_SPEED * deltaTime;
   if (m_T >= 1.0f) {
     m_T = fmod(m_T, 1.0f);
     m_OnCurve1 = !m_OnCurve1;
