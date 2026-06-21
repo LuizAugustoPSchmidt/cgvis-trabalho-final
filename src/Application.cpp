@@ -310,6 +310,7 @@ void Application::Reset() {
   m_Paused = false;
   m_StartScreen = false;
   m_SpawnAngle = 0.0f;
+  m_NextSquadId = 0;
 
   m_Player = std::make_unique<Player>();
 

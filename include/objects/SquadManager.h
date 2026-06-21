@@ -45,6 +45,9 @@ public:
 
     ~SquadManager() = default;
 
+    void SetId(int id) { m_Id = id; }
+    int GetId() const { return m_Id; }
+
     void SetPosition(const glm::vec4 &position) { m_Position = position; }
     glm::vec4 GetPosition() const { return m_Position; }
 
@@ -150,6 +153,7 @@ public:
     }
 
 private:
+    int m_Id = -1;
     glm::vec4 m_Position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     glm::vec4 m_Velocity = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
     glm::mat4 m_RotationMatrix = glm::mat4(1.0f);

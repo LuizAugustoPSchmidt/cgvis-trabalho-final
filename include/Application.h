@@ -108,6 +108,7 @@ private:
   std::vector<std::unique_ptr<Projectile>> m_Projectiles;
 
   // Game State
+  int m_NextSquadId = 0;
   bool m_StartScreen = true;
   bool m_GameOver = false;
   bool m_Victory = false;
@@ -201,7 +202,9 @@ private:
     const float angleStep = (2.0f * 3.14159265f) / totalExpectedSquads;
 
     for (int s = 0; s < numSquads; ++s) {
+      int squadId = m_NextSquadId++;
       SquadManager<T> squad;
+      squad.SetId(squadId);
       glm::vec4 center = glm::vec4(
           distance * cos(m_SpawnAngle),
           (rand() % 40) - 20.0f,
@@ -212,6 +215,7 @@ private:
       for (int i = 0; i < unitsPerSquad; ++i) {
         glm::vec4 offset = squad.GetLocalOffset(i);
         auto tie = std::make_unique<T>(center + offset);
+        tie->SetSquadId(squadId);
         squad.AddMember(tie.get());
         container.push_back(std::move(tie));
       }

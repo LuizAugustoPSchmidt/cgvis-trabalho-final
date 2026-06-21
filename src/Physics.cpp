@@ -59,8 +59,8 @@ void Application::CheckCollisions() {
   // 4. Enemy vs Enemy
   CheckCollisions(allEnemies, allEnemies, [](auto &s1, auto &s2) {
 #if !RELEASE
-    std::cout << s1->GetClassId() << " and " << s2->GetClassId()
-              << " hit. Both dead" << std::endl;
+    std::cout << s1->GetClassId() << " (Squad " << s1->GetSquadId() << ") and "
+              << s2->GetClassId() << " (Squad " << s2->GetSquadId() << ") hit. Both dead" << std::endl;
 #endif // !RELEASE
     s1->Kill();
     s2->Kill();

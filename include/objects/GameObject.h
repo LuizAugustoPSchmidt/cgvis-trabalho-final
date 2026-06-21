@@ -22,12 +22,15 @@ public:
   void Kill() { m_Health = 0; }
   int GetHealth() const { return m_Health; }
   void TakeDamage(int amount) { m_Health -= amount; }
+  int GetSquadId() const { return m_SquadId; }
+  void SetSquadId(int id) { m_SquadId = id; }
 
 protected:
   std::string m_ModelName;
   int m_ObjectId;
   const std::string m_ClassId;
   int m_Health = 3;
+  int m_SquadId = -1;
 };
 
 #endif // GAMEOBJECT_H
