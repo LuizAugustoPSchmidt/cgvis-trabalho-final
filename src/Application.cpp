@@ -186,6 +186,8 @@ void Application::LoadAssets(int argc, char *argv[]) {
     LoadModel(argv[1]);
   }
 
+  CreateMinimapTriangle();
+
   TextRendering_Init();
 }
 
@@ -328,4 +330,62 @@ std::vector<GameObject *> Application::GetHarmfulObjects() {
   for (auto &a : m_Asteroids)
     harmful.push_back(a.get());
   return harmful;
+}
+
+void Application::CreateMinimapTriangle() {
+  // Flat unit equilateral triangle in XZ plane pointing along +Z
+  std::vector<float> positions = {
+      0.0f, 0.0f, 1.0f, 1.0f,         // 0: Tip
+      -0.866025f, 0.0f, -0.5f, 1.0f,  // 1: Left
+      0.866025f, 0.0f, -0.5f, 1.0f    // 2: Right
+  };
+
+  std::vector<float> normals = {
+      0.0f, 1.0f, 0.0f, 0.0f,
+      0.0f, 1.0f, 0.0f, 0.0f,
+      0.0f, 1.0f, 0.0f, 0.0f
+  };
+
+  std::vector<float> texcoords = {
+      0.5f, 1.0f,
+      0.0f, 0.0f,
+      1.0f, 0.0f
+  };
+
+  std::vector<unsigned int> indices = {0, 2, 1};
+
+  GLuint vao_id;
+  glGenVertexArrays(1, &vao_id);
+  glBindVertexArray(vao_id);
+
+  auto upload_vbo = [](GLuint location, GLint size, const std::vector<float> &data) {
+    GLuint vbo_id;
+    glGenBuffers(1, &vbo_id);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(location);
+  };
+
+  upload_vbo(0, 4, positions);
+  upload_vbo(1, 4, normals);
+  upload_vbo(2, 2, texcoords);
+
+  GLuint ebo_id;
+  glGenBuffers(1, &ebo_id);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+  glBindVertexArray(0);
+
+  SceneObject theobject;
+  theobject.name = "minimap_triangle";
+  theobject.first_index = 0;
+  theobject.num_indices = 3;
+  theobject.rendering_mode = GL_TRIANGLES;
+  theobject.vertex_array_object_id = vao_id;
+  theobject.bbox_min = glm::vec3(-0.866025f, 0.0f, -0.5f);
+  theobject.bbox_max = glm::vec3(0.866025f, 0.0f, 1.0f);
+
+  m_VirtualScene["minimap_triangle"] = theobject;
 }

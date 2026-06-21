@@ -102,6 +102,8 @@ void Application::RenderMinimap() {
   int width, height;
   glfwGetFramebufferSize(m_Window, &width, &height);
 
+  glDisable(GL_CULL_FACE);
+
   // 2. Define Minimap Viewport (Bottom Right)
   int minimapSize = std::min(width, height) / 4;
   int margin = 20;
@@ -129,40 +131,26 @@ void Application::RenderMinimap() {
   // 4. Render Blips
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  auto drawArrowBlip = [&](glm::vec4 pos,
-                           glm::vec4 forward,
-                           int color,
-                           float size) {
-    // Base dot
-    DrawObject(
-        "the_sphere",
-        color,
-        Matrix_Translate(pos.x, pos.y, pos.z) * Matrix_Scale(size, size, size)
-    );
-    // Orientation line
-    DrawLine(pos, pos + forward * size * 3.0f, color);
-  };
+  // Player blip
+  DrawTriangleBlip(playerPos, m_Player->GetForward(), DEBUG_VECTOR_GREEN, 10.0f);
 
-  // Player arrow
-  drawArrowBlip(playerPos, m_Player->GetForward(), DEBUG_VECTOR_GREEN, 10.0f);
-
-  // Enemy arrows
+  // Enemy blips
   for (const auto &ship : m_TieFighters)
-    drawArrowBlip(
+    DrawTriangleBlip(
         ship->GetPosition(),
         ship->GetForward(),
         DEBUG_VECTOR_RED,
         5.0f
     );
   for (const auto &ship : m_TieDefenders)
-    drawArrowBlip(
+    DrawTriangleBlip(
         ship->GetPosition(),
         ship->GetForward(),
         DEBUG_VECTOR_RED,
         5.0f
     );
   for (const auto &ship : m_TiePhantoms)
-    drawArrowBlip(
+    DrawTriangleBlip(
         ship->GetPosition(),
         ship->GetForward(),
         DEBUG_VECTOR_RED,
@@ -171,6 +159,25 @@ void Application::RenderMinimap() {
 
   // 5. Restore Main Viewport
   glViewport(0, 0, width, height);
+  glEnable(GL_CULL_FACE);
+}
+
+void Application::DrawTriangleBlip(glm::vec4 pos, glm::vec4 forward, int color, float size) {
+  glm::vec4 F = forward;
+  F.y = 0.0f; // Project to XZ plane
+  float len = norm(F);
+  if (len > 0.001f) {
+    F /= len;
+  } else {
+    F = glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+  }
+
+  // Render the custom triangle model on the GPU
+  glm::mat4 model = Matrix_Translate(pos.x, pos.y, pos.z) *
+                    Matrix_Look_At(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), F, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)) *
+                    Matrix_Scale(size, size, size);
+
+  DrawObject("minimap_triangle", color, model);
 }
 
 void Application::DrawObject(

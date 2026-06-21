@@ -41,6 +41,7 @@ public:
   );
 
   void DrawLine(glm::vec4 from, glm::vec4 to, int color_id);
+  void DrawTriangleBlip(glm::vec4 pos, glm::vec4 forward, int color, float size);
 
   // Callbacks
   void KeyCallback(int key, int scancode, int action, int mod);
@@ -144,6 +145,7 @@ private:
   void Reset();
 
   void LoadModel(const char *path, const std::string &prefix = "");
+  void CreateMinimapTriangle();
 
   static GameObject *ToRaw(GameObject *p) { return p; }
   template <typename T> static GameObject *ToRaw(const std::unique_ptr<T> &p) {
