@@ -93,6 +93,7 @@ out vec4 color;
 // Constantes
 #define M_PI   3.14159265358979323846
 #define M_PI_2 1.57079632679489661923
+#define TIE_BRIGHTNESS 2.0
 
 void main()
 {
@@ -225,25 +226,25 @@ void main()
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd0 = texture(TextureImage4, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage4, vec2(U,V)).rgb * TIE_BRIGHTNESS;
     }
     else if ( object_id == TIE_DEFENDER )
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd0 = texture(TextureImage5, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage5, vec2(U,V)).rgb * TIE_BRIGHTNESS;
     }
     else if ( object_id == TIE_PHANTOM_HULL )
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd0 = texture(TextureImage6, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage6, vec2(U,V)).rgb * TIE_BRIGHTNESS;
     }
     else if ( object_id == TIE_PHANTOM_WINGS )
     {
         U = texcoords.x;
         V = texcoords.y;
-        Kd0 = texture(TextureImage7, vec2(U,V)).rgb;
+        Kd0 = texture(TextureImage7, vec2(U,V)).rgb * TIE_BRIGHTNESS;
     }
     else if ( object_id == DEBUG_VECTOR_RED )
     {
