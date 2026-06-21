@@ -12,17 +12,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 
-#include <algorithm>
-#include <fstream>
-#include <limits>
-#include <map>
-#include <set>
-#include <sstream>
-#include <stack>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -34,14 +26,14 @@
 #include <vendor/tiny_obj_loader.h>
 
 #include "Application.h"
-#include "matrices.h"
 #include "opengl_utils.h"
 #include "scene.h"
-#include "utils.h"
 
 // ObjModel implementation
 ObjModel::ObjModel(
-    const char *filename, const char *basepath, bool triangulate
+    const char *filename,
+    const char *basepath,
+    bool triangulate
 ) {
   printf("Carregando objetos do arquivo \"%s\"...\n", filename);
   std::string fullpath(filename);
@@ -55,7 +47,14 @@ ObjModel::ObjModel(
   }
   std::string warn, err;
   bool ret = tinyobj::LoadObj(
-      &attrib, &shapes, &materials, &warn, &err, filename, basepath, triangulate
+      &attrib,
+      &shapes,
+      &materials,
+      &warn,
+      &err,
+      filename,
+      basepath,
+      triangulate
   );
   if (!err.empty())
     fprintf(stderr, "\n%s\n", err.c_str());
@@ -70,7 +69,7 @@ ObjModel::ObjModel(
 }
 
 int main(int argc, char *argv[]) {
-  std::srand(static_cast<unsigned int>(std::time(nullptr)));
+  std::srand(static_cast<unsigned int>(time(nullptr)));
   Application app;
   if (!app.Init())
     return EXIT_FAILURE;

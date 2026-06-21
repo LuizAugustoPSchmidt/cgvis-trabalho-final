@@ -56,7 +56,15 @@ public:
   void SetMouseScrollCallback();
   void SetFramebufferSizeCallback();
 
+  void SetProjectileColor(const glm::vec3 &color);
+
+  void AddProjectile(std::unique_ptr<Projectile> projectile);
+  std::vector<std::unique_ptr<Projectile>> &GetProjectiles() {
+    return m_Projectiles;
+  }
+
 private:
+  Shader *GetMainShader() const { return m_MainShader.get(); }
   GLFWwindow *m_Window;
 
   // Scene State
@@ -92,6 +100,7 @@ private:
   std::vector<std::unique_ptr<TieFighter>> m_TieFighters;
   std::vector<std::unique_ptr<TieDefender>> m_TieDefenders;
   std::vector<std::unique_ptr<TiePhantom>> m_TiePhantoms;
+  std::vector<std::unique_ptr<Projectile>> m_Projectiles;
 
   // Game State
   bool m_StartScreen = true;

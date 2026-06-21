@@ -2,8 +2,8 @@
 #include "Application.h"
 #include "ObjectIds.h"
 #include "matrices.h"
-#include <glad/glad.h>
 #include <algorithm>
+#include <glad/glad.h>
 
 constexpr float NORMAL_SPEED = 15.0f;
 constexpr float MAX_BOOST_SPEED = 45.0f;
@@ -14,8 +14,7 @@ Player::Player()
     : GameObject("spaceship", SPACESHIP_MATERIAL, "player"),
       m_Position(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)),
       m_Forward(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f)),
-      m_Up(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)),
-      m_Speed(NORMAL_SPEED) {
+      m_Up(glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)), m_Speed(NORMAL_SPEED) {
   m_Parts = {
       {"Cube", SPACESHIP_MATERIAL, true},
       {"Cube_motor_0", SPACESHIP_MOTOR, false},
@@ -59,17 +58,6 @@ void Player::Update(float deltaTime) {
   }
 
   m_Position += m_Forward * m_Speed * deltaTime;
-
-  for (auto &p : m_Projectiles)
-    p->Update(deltaTime);
-  m_Projectiles.erase(
-      std::remove_if(
-          m_Projectiles.begin(),
-          m_Projectiles.end(),
-          [](const auto &p) { return p->IsDead(); }
-      ),
-      m_Projectiles.end()
-  );
 }
 
 void Player::UpdateOrientation() {
@@ -87,18 +75,42 @@ void Player::UpdateOrientation() {
   );
 }
 
-void Player::Shoot() {
-  glm::vec4 spawnPos = m_Position + m_Forward * 2.0f;
-  glm::vec4 velocity = m_Forward * 80.0f;
-  m_Projectiles.push_back(std::make_unique<Projectile>(spawnPos, velocity));
+void Player::Shoot(Application &app) {
+  // Wingtip offsets in local space (scaled by 0.1 later)
+  // X: +-8.0 (Slightly outward from cannon tips)
+  // Y: +2.6 / -2.2 (Upper/Lower wing heights)
+  // Z: 9.3 (Tip depth) + 25.0 (Half laser length / 0.1) = 34.3
+  std::vector<glm::vec3> offsets = {
+      { 8.0f,  2.6f, 34.3f}, // Top Right
+      {-8.0f,  2.6f, 34.3f}, // Top Left
+      { 8.0f, -2.2f, 34.3f}, // Bottom Right
+      {-8.0f, -2.2f, 34.3f}  // Bottom Left
+  };
+
+  glm::vec4 right = normalize(crossproduct(m_Forward, m_Up));
+  // Additive velocity: ship speed + constant projectile speed
+  glm::vec4 velocity = m_Forward * (m_Speed + 100.0f);
+
+  for (const auto& offset : offsets) {
+    // Transform offset to world space using ship's orientation
+    glm::vec4 spawnPos = m_Position + 
+                         right     * (offset.x * 0.1f) + 
+                         m_Up      * (offset.y * 0.1f) + 
+                         m_Forward * (offset.z * 0.1f);
+
+    app.AddProjectile(std::make_unique<Projectile>(
+        spawnPos,
+        velocity,
+        glm::vec3(1.0f, 0.0f, 0.0f)
+    ));
+  }
 }
 
+
 void Player::Render(Application &app) {
-  glm::mat4 model =
-      Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
-      Matrix_Rotate_Y(m_Theta) *
-      Matrix_Rotate_X(m_Phi) *
-      Matrix_Scale(0.1f, 0.1f, 0.1f);
+  glm::mat4 model = Matrix_Translate(m_Position.x, m_Position.y, m_Position.z) *
+                    Matrix_Rotate_Y(m_Theta) * Matrix_Rotate_X(m_Phi) *
+                    Matrix_Scale(0.1f, 0.1f, 0.1f);
 
   for (const auto &part : m_Parts) {
     if (part.flip_normals) {

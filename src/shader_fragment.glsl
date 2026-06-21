@@ -18,6 +18,19 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+// Light uniforms for Hemispherical Ambient
+uniform vec3 ambient_light_top;
+uniform vec3 ambient_light_bottom;
+
+// Light uniforms for Directional Star Light
+uniform vec4 star_direction; // Direction pointing TO the star
+uniform vec3 star_diffuse_color;
+uniform vec3 star_specular_color;
+
+// Material properties (simplified for now)
+uniform vec3 Ks; // Specular reflectance
+uniform float shininess; // Shininess exponent (q)
+
 // Identificador que define qual objeto está sendo desenhado no momento
 #define SPHERE 0
 #define BUNNY  1
@@ -63,6 +76,17 @@ uniform sampler2D TextureImage5;
 uniform sampler2D TextureImage6;
 uniform sampler2D TextureImage7;
 
+uniform vec3 projectile_color;
+
+struct ProjectileLight {
+    vec4 start;
+    vec4 end;
+    vec3 color;
+};
+
+uniform int num_projectile_lights;
+uniform ProjectileLight projectile_lights[40];
+
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
 
@@ -88,11 +112,14 @@ void main()
     // normais de cada vértice.
     vec4 n = normalize(normal);
 
-    // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
-    vec4 l = normalize(vec4(1.0,1.0,0.0,0.0));
+    // Vetor que define o sentido da fonte de luz (Estrela)
+    vec4 l = normalize(star_direction);
 
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
+
+    // Vetor "half-way" para Blinn-Phong
+    vec4 h = normalize(v + l);
 
     // Coordenadas de textura U e V
     float U = 0.0;
@@ -232,18 +259,52 @@ void main()
     }
     else if ( object_id == LASER_BOLT )
     {
-        Kd0 = vec3(0.0, 1.0, 0.1);
+        Kd0 = projectile_color;
     }
 
     // Equação de Iluminação
-    float lambert = max(0,dot(n,l));
+    float lambert = max(0, dot(n, l));
+    float blinn_phong_specular = pow(max(0.0, dot(n, h)), shininess);
+
+    // Hemispherical Ambient calculation
+    vec3 ambient = mix(ambient_light_bottom, ambient_light_top, n.y * 0.5 + 0.5);
 
     if (object_id == BACKGROUND)
         color.rgb = Kd0;
     else if (object_id >= 100) // Debug vectors are unlit
         color.rgb = Kd0;
     else
-        color.rgb = Kd0 * (lambert + 0.01);
+    {
+        vec3 diffuse_term = Kd0 * (star_diffuse_color * lambert + ambient);
+
+        // Contribution from Projectile Lights
+        for (int i = 0; i < num_projectile_lights; ++i)
+        {
+            vec4 A = projectile_lights[i].start;
+            vec4 B = projectile_lights[i].end;
+            vec3 light_color = projectile_lights[i].color;
+
+            // Closest point on segment AB to point p
+            vec4 AB = B - A;
+            float t = dot(p - A, AB) / dot(AB, AB);
+            t = clamp(t, 0.0, 1.0);
+            vec4 closest_point = A + t * AB;
+
+            vec4 L = closest_point - p;
+            float dist = length(L);
+            L = normalize(L);
+
+            float p_lambert = max(0.0, dot(n, L));
+            
+            // Attenuation
+            float attenuation = 1.0 / (dist * dist + 1.0);
+            
+            diffuse_term += Kd0 * light_color * p_lambert * attenuation * 20.0;
+        }
+
+        vec3 specular_term = star_specular_color * Ks * blinn_phong_specular;
+        color.rgb = diffuse_term + specular_term;
+    }
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
     // necessário:

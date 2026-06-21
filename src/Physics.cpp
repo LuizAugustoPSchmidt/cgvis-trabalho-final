@@ -1,5 +1,4 @@
 #include "Application.h"
-#include <algorithm>
 #include <iostream>
 
 bool Application::SpheresIntersect(
@@ -24,13 +23,22 @@ void Application::CheckCollisions() {
     m_Player->Kill();
   });
 
+  // New Phase 2: Player vs Projectiles
+  CheckCollisions(playerVec, m_Projectiles, [&](auto &p, auto &proj) {
+    m_Player->Kill();
+  });
+
   if (m_Player->IsDead()) {
     m_GameOver = true;
     return;
   }
 
   // 2. Projectiles vs Enemies
-  CheckCollisions(m_Player->GetProjectiles(), allEnemies, [](auto &proj, auto &enemy) {
+  CheckCollisions(m_Projectiles, allEnemies, [](auto &proj, auto &enemy) {
+#if !RELEASE
+    std::cout << enemy->GetClassId() << " hit by " << proj->GetClassId()
+              << std::endl;
+#endif // !RELEASE
     proj->Kill();
     enemy->TakeDamage(1);
   });
