@@ -11,6 +11,8 @@ public:
   virtual ~TieDefender() = default;
 
   virtual void Update(float deltaTime) override;
+  void Update(float deltaTime, Application &app);
+  void Shoot(Application &app);
   virtual void Render(Application &app) override;
 
   void SetTarget(glm::vec4 target) { m_Target = target; }
@@ -24,6 +26,7 @@ private:
   glm::vec4 m_Acceleration = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
   glm::vec4 m_Target = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
   glm::mat4 m_RotationMatrix = glm::mat4(1.0f);
+  float m_ShootCooldown = 0.0f;
 };
 
 #endif

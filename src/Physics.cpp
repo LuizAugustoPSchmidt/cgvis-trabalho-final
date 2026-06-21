@@ -25,7 +25,10 @@ void Application::CheckCollisions() {
 
   // New Phase 2: Player vs Projectiles
   CheckCollisions(playerVec, m_Projectiles, [&](auto &p, auto &proj) {
-    m_Player->Kill();
+    if (proj->IsEnemy()) {
+      proj->Kill();
+      m_Player->Kill();
+    }
   });
 
   if (m_Player->IsDead()) {
@@ -35,12 +38,14 @@ void Application::CheckCollisions() {
 
   // 2. Projectiles vs Enemies
   CheckCollisions(m_Projectiles, allEnemies, [](auto &proj, auto &enemy) {
+    if (!proj->IsEnemy()) {
 #if !RELEASE
-    std::cout << enemy->GetClassId() << " hit by " << proj->GetClassId()
-              << std::endl;
+      std::cout << enemy->GetClassId() << " hit by " << proj->GetClassId()
+                << std::endl;
 #endif // !RELEASE
-    proj->Kill();
-    enemy->TakeDamage(1);
+      proj->Kill();
+      enemy->TakeDamage(1);
+    }
   });
 
   // 3. All Enemies vs Asteroids

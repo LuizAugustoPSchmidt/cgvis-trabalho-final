@@ -7,7 +7,7 @@
 
 class Projectile : public GameObject {
 public:
-  Projectile(glm::vec4 position, glm::vec4 velocity, glm::vec3 color);
+  Projectile(glm::vec4 position, glm::vec4 velocity, glm::vec3 color, bool isEnemy = false);
   virtual ~Projectile() = default;
 
   virtual void Update(float deltaTime) override;
@@ -16,6 +16,7 @@ public:
   virtual glm::vec4 GetPosition() const override { return m_Position; }
   virtual float GetRadius() const override { return 0.3f; }
   glm::vec3 GetColor() const { return m_Color; }
+  bool IsEnemy() const { return m_IsEnemy; }
 
   glm::vec4 GetStartPoint() const;
   glm::vec4 GetEndPoint() const;
@@ -24,6 +25,7 @@ private:
   glm::vec4 m_Position;
   glm::vec4 m_Velocity;
   glm::vec3 m_Color;
+  bool m_IsEnemy;
   float m_TimeAlive = 0.0f;
   static constexpr float MAX_LIFETIME = 1.0f;
 };

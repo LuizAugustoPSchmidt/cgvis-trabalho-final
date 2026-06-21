@@ -3,9 +3,9 @@
 #include "ObjectIds.h"
 #include "matrices.h"
 
-Projectile::Projectile(glm::vec4 position, glm::vec4 velocity, glm::vec3 color)
+Projectile::Projectile(glm::vec4 position, glm::vec4 velocity, glm::vec3 color, bool isEnemy)
     : GameObject("laser_Capsule", LASER_BOLT, "projectile"),
-      m_Position(position), m_Velocity(velocity), m_Color(color) {}
+      m_Position(position), m_Velocity(velocity), m_Color(color), m_IsEnemy(isEnemy) {}
 
 void Projectile::Update(float deltaTime) {
   m_Position += m_Velocity * deltaTime;

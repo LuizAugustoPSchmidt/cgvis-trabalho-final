@@ -223,15 +223,15 @@ void Application::Update(float deltaTime) {
       asteroid->Update(deltaTime);
     for (auto &ship : m_TieFighters) {
       ship->SetTarget(m_Player->GetPosition());
-      ship->Update(deltaTime);
+      ship->Update(deltaTime, *this);
     }
     for (auto &ship : m_TieDefenders) {
       ship->SetTarget(m_Player->GetPosition());
-      ship->Update(deltaTime);
+      ship->Update(deltaTime, *this);
     }
     for (auto &ship : m_TiePhantoms) {
       ship->SetTarget(m_Player->GetPosition());
-      ship->Update(deltaTime);
+      ship->Update(deltaTime, *this);
     }
 
     // Update Projectiles

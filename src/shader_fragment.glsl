@@ -285,6 +285,10 @@ void main()
             vec4 B = projectile_lights[i].end;
             vec3 light_color = projectile_lights[i].color;
 
+            // Skip green (enemy) projectile lights
+            if (light_color.g > 0.5)
+                continue;
+
             // Closest point on segment AB to point p
             vec4 AB = B - A;
             float t = dot(p - A, AB) / dot(AB, AB);

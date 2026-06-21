@@ -3,13 +3,17 @@
 #include "ObjectIds.h"
 #include "glm/geometric.hpp"
 #include "matrices.h"
+#include "objects/Projectile.h"
+#include <cstdlib>
 
 constexpr float ACCELERATION_MAX = 10.0f;
 constexpr float SPEED_MAX = 30.0f;
 
 TieDefender::TieDefender(glm::vec4 position)
     : GameObject("tiedefender_obj1", TIE_DEFENDER, "tie-defender"),
-      m_Position(position) {}
+      m_Position(position) {
+  m_ShootCooldown = static_cast<float>(rand() % 100) / 100.0f * 1.5f;
+}
 
 void TieDefender::Update(float deltaTime) {
   // 1. Calculate Acceleration (Steering Force) towards the target
@@ -52,4 +56,43 @@ void TieDefender::Render(Application &app) {
   app.DrawLine(m_Position, m_Position + m_Velocity, DEBUG_VECTOR_GREEN);
   app.DrawLine(m_Position, m_Position + m_Acceleration, DEBUG_VECTOR_RED);
 #endif // !RELEASE
+}
+
+void TieDefender::Update(float deltaTime, Application &app) {
+  Update(deltaTime);
+
+  m_ShootCooldown -= deltaTime;
+  if (m_ShootCooldown <= 0.0f) {
+    float dist = glm::length(m_Position - m_Target);
+    if (dist < 120.0f) {
+      Shoot(app);
+      m_ShootCooldown = 1.2f; // Fast fire rate for TIE Defender
+    }
+  }
+}
+
+void TieDefender::Shoot(Application &app) {
+  glm::vec4 forward = GetForward();
+  // Get right vector
+  glm::vec4 right = glm::normalize(crossproduct(forward, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f)));
+
+  float speed = glm::length(m_Velocity);
+  glm::vec4 velocity = forward * (speed + 80.0f);
+
+  // Spawn left and right lasers
+  glm::vec4 spawnPosLeft = m_Position - right * 0.6f + forward * 1.5f;
+  glm::vec4 spawnPosRight = m_Position + right * 0.6f + forward * 1.5f;
+
+  app.AddProjectile(std::make_unique<Projectile>(
+      spawnPosLeft,
+      velocity,
+      glm::vec3(0.0f, 1.0f, 0.0f), // green
+      true // isEnemy
+  ));
+  app.AddProjectile(std::make_unique<Projectile>(
+      spawnPosRight,
+      velocity,
+      glm::vec3(0.0f, 1.0f, 0.0f), // green
+      true // isEnemy
+  ));
 }
