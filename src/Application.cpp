@@ -236,21 +236,18 @@ void Application::Update(float deltaTime) {
     for (auto &asteroid : m_Asteroids)
       asteroid->Update(deltaTime);
     for (auto &squad : m_FighterSquads)
-      squad.Coordinate(deltaTime);
+      squad.Coordinate(deltaTime, m_Player->GetPosition());
     for (auto &ship : m_TieFighters) {
-      ship->SetTarget(m_Player->GetPosition());
       ship->Update(deltaTime, *this);
     }
     for (auto &squad : m_DefenderSquads)
-      squad.Coordinate(deltaTime);
+      squad.Coordinate(deltaTime, m_Player->GetPosition());
     for (auto &ship : m_TieDefenders) {
-      ship->SetTarget(m_Player->GetPosition());
       ship->Update(deltaTime, *this);
     }
     for (auto &squad : m_PhantomSquads)
-      squad.Coordinate(deltaTime);
+      squad.Coordinate(deltaTime, m_Player->GetPosition());
     for (auto &ship : m_TiePhantoms) {
-      ship->SetTarget(m_Player->GetPosition());
       ship->Update(deltaTime, *this);
     }
 

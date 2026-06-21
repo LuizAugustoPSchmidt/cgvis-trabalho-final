@@ -3,6 +3,7 @@
 
 #include <array>
 #include <memory>
+#include <glm/geometric.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
@@ -69,13 +70,41 @@ public:
         return m_Ties[index];
     }
 
-    void Coordinate(float deltaTime) {
+    void Coordinate(float deltaTime, const glm::vec4 &playerPos) {
         CleanupDeadMembers();
-        // Coordination logic will be implemented here
+
+        // 1. Move squad center towards player (matching physics integration of TIEs)
+        glm::vec4 targetDir = playerPos - m_Position;
+        float dist = glm::length(targetDir);
+        if (dist > 0.001f) {
+            glm::vec4 acceleration = (targetDir / dist) * 10.0f; // ACCELERATION_MAX
+            m_Velocity += acceleration * deltaTime;
+            float speed = glm::length(m_Velocity);
+            if (speed > 30.0f) { // SPEED_MAX
+                m_Velocity = (m_Velocity / speed) * 30.0f;
+            }
+            m_Position += m_Velocity * deltaTime;
+        }
+
+        // 2. Set targets for TIEs in their YZ circle formation slots
+        for (int i = 0; i < SquadTraits<T>::MAX_CAPACITY; ++i) {
+            T* tie = m_Ties[i];
+            if (!tie) continue;
+
+            float angle = (2.0f * 3.14159265f * i) / SquadTraits<T>::MAX_CAPACITY;
+            glm::vec4 offset = glm::vec4(
+                0.0f,
+                SQUAD_SPAWN_RADIUS * sin(angle),
+                SQUAD_SPAWN_RADIUS * cos(angle),
+                0.0f
+            );
+            tie->SetTarget(m_Position + offset);
+        }
     }
 
 private:
     glm::vec4 m_Position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 m_Velocity = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
     std::array<T*, SquadTraits<T>::MAX_CAPACITY> m_Ties;
     int m_Size;
 };
