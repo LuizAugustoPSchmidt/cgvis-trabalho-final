@@ -1,6 +1,9 @@
 #ifndef APPLICATION_CONSTANTS_H
 #define APPLICATION_CONSTANTS_H
 
+// Squad Spawning Constants
+constexpr float SQUAD_SPAWN_RADIUS = 10.0f;
+
 // Minimap Blip Scales
 constexpr float MINIMAP_PLAYER_BLIP_SIZE = 10.0f;
 constexpr float MINIMAP_ENEMY_BLIP_SIZE = 5.0f;

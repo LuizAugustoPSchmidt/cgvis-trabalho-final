@@ -208,11 +208,13 @@ private:
           distance * sin(m_SpawnAngle),
           1.0f
       );
+      squad.SetPosition(center);
       for (int i = 0; i < unitsPerSquad; ++i) {
+        float angle = (2.0f * 3.14159265f * i) / unitsPerSquad;
         glm::vec4 offset = glm::vec4(
-            (rand() % 10) - 5.0f,
-            (rand() % 10) - 5.0f,
-            (rand() % 10) - 5.0f,
+            0.0f,
+            SQUAD_SPAWN_RADIUS * sin(angle),
+            SQUAD_SPAWN_RADIUS * cos(angle),
             0.0f
         );
         auto tie = std::make_unique<T>(center + offset);

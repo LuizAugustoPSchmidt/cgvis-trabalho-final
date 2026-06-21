@@ -42,6 +42,9 @@ public:
 
     ~SquadManager() = default;
 
+    void SetPosition(const glm::vec4 &position) { m_Position = position; }
+    glm::vec4 GetPosition() const { return m_Position; }
+
     // Bind a TIE to this squad
     bool AddMember(T* tie) {
         if (m_Size >= SquadTraits<T>::MAX_CAPACITY) {
@@ -72,6 +75,7 @@ public:
     }
 
 private:
+    glm::vec4 m_Position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     std::array<T*, SquadTraits<T>::MAX_CAPACITY> m_Ties;
     int m_Size;
 };
