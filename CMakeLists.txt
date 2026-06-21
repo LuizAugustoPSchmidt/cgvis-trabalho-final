@@ -18,6 +18,7 @@ set(SOURCES
   src/objects/TieFighter.cpp
   src/objects/TieDefender.cpp
   src/objects/TiePhantom.cpp
+  src/objects/SquadManager.cpp
   src/opengl_utils.cpp
   src/correcao.cpp
   src/vendor/textrendering.cpp

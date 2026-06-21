@@ -1,0 +1,1 @@
+#include "objects/SquadManager.h"

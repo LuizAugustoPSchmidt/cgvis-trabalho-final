@@ -12,6 +12,7 @@
 #include "objects/TieDefender.h"
 #include "objects/TieFighter.h"
 #include "objects/TiePhantom.h"
+#include "objects/SquadManager.h"
 #include "rendering/VertexArray.h"
 #include "scene.h"
 #include <glm/mat4x4.hpp>
@@ -101,6 +102,9 @@ private:
   std::vector<std::unique_ptr<TieFighter>> m_TieFighters;
   std::vector<std::unique_ptr<TieDefender>> m_TieDefenders;
   std::vector<std::unique_ptr<TiePhantom>> m_TiePhantoms;
+  std::vector<SquadManager<TieFighter>> m_FighterSquads;
+  std::vector<SquadManager<TieDefender>> m_DefenderSquads;
+  std::vector<SquadManager<TiePhantom>> m_PhantomSquads;
   std::vector<std::unique_ptr<Projectile>> m_Projectiles;
 
   // Game State
@@ -189,13 +193,15 @@ private:
       int numSquads,
       int unitsPerSquad,
       float distance,
-      std::vector<std::unique_ptr<T>> &container
+      std::vector<std::unique_ptr<T>> &container,
+      std::vector<SquadManager<T>> &squadsContainer
   ) {
     const float totalExpectedSquads =
         11.0f; // 6 Fighters + 3 Phantoms + 2 Defenders
     const float angleStep = (2.0f * 3.14159265f) / totalExpectedSquads;
 
     for (int s = 0; s < numSquads; ++s) {
+      SquadManager<T> squad;
       glm::vec4 center = glm::vec4(
           distance * cos(m_SpawnAngle),
           (rand() % 40) - 20.0f,
@@ -209,8 +215,11 @@ private:
             (rand() % 10) - 5.0f,
             0.0f
         );
-        container.push_back(std::make_unique<T>(center + offset));
+        auto tie = std::make_unique<T>(center + offset);
+        squad.AddMember(tie.get());
+        container.push_back(std::move(tie));
       }
+      squadsContainer.push_back(squad);
       m_SpawnAngle += angleStep;
     }
   }

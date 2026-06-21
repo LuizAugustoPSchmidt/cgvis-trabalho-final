@@ -185,9 +185,9 @@ void Application::LoadAssets(int argc, char *argv[]) {
   }
 
   // Spawn TIE Squadrons
-  SpawnSquadrons(TIE_FIGHTER_SQUADRONS, TIE_FIGHTER_SQUADRON_SIZE, TIE_FIGHTER_SQUADRON_DIST, m_TieFighters);
-  SpawnSquadrons(TIE_PHANTOM_SQUADRONS, TIE_PHANTOM_SQUADRON_SIZE, TIE_PHANTOM_SQUADRON_DIST, m_TiePhantoms);
-  SpawnSquadrons(TIE_DEFENDER_SQUADRONS, TIE_DEFENDER_SQUADRON_SIZE, TIE_DEFENDER_SQUADRON_DIST, m_TieDefenders);
+  SpawnSquadrons(TIE_FIGHTER_SQUADRONS, TIE_FIGHTER_SQUADRON_SIZE, TIE_FIGHTER_SQUADRON_DIST, m_TieFighters, m_FighterSquads);
+  SpawnSquadrons(TIE_PHANTOM_SQUADRONS, TIE_PHANTOM_SQUADRON_SIZE, TIE_PHANTOM_SQUADRON_DIST, m_TiePhantoms, m_PhantomSquads);
+  SpawnSquadrons(TIE_DEFENDER_SQUADRONS, TIE_DEFENDER_SQUADRON_SIZE, TIE_DEFENDER_SQUADRON_DIST, m_TieDefenders, m_DefenderSquads);
 
   if (argc > 1) {
     LoadModel(argv[1]);
@@ -235,14 +235,20 @@ void Application::Update(float deltaTime) {
     m_Player->Update(deltaTime);
     for (auto &asteroid : m_Asteroids)
       asteroid->Update(deltaTime);
+    for (auto &squad : m_FighterSquads)
+      squad.Coordinate(deltaTime);
     for (auto &ship : m_TieFighters) {
       ship->SetTarget(m_Player->GetPosition());
       ship->Update(deltaTime, *this);
     }
+    for (auto &squad : m_DefenderSquads)
+      squad.Coordinate(deltaTime);
     for (auto &ship : m_TieDefenders) {
       ship->SetTarget(m_Player->GetPosition());
       ship->Update(deltaTime, *this);
     }
+    for (auto &squad : m_PhantomSquads)
+      squad.Coordinate(deltaTime);
     for (auto &ship : m_TiePhantoms) {
       ship->SetTarget(m_Player->GetPosition());
       ship->Update(deltaTime, *this);
@@ -308,10 +314,13 @@ void Application::Reset() {
   m_TieFighters.clear();
   m_TieDefenders.clear();
   m_TiePhantoms.clear();
+  m_FighterSquads.clear();
+  m_DefenderSquads.clear();
+  m_PhantomSquads.clear();
 
-  SpawnSquadrons(6, 12, 100.0f, m_TieFighters);
-  SpawnSquadrons(3, 6, 150.0f, m_TiePhantoms);
-  SpawnSquadrons(2, 3, 200.0f, m_TieDefenders);
+  SpawnSquadrons(6, 12, 100.0f, m_TieFighters, m_FighterSquads);
+  SpawnSquadrons(3, 6, 150.0f, m_TiePhantoms, m_PhantomSquads);
+  SpawnSquadrons(2, 3, 200.0f, m_TieDefenders, m_DefenderSquads);
 }
 
 void Application::Shutdown() {

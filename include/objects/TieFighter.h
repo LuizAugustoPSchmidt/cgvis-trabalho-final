@@ -17,6 +17,12 @@ public:
 
   void SetTarget(glm::vec4 target) { m_Target = target; }
   virtual glm::vec4 GetPosition() const override { return m_Position; }
+
+  glm::vec4 GetVelocity() const { return m_Velocity; }
+  glm::vec4 GetAcceleration() const { return m_Acceleration; }
+  void SetAcceleration(const glm::vec4 &acc) { m_Acceleration = acc; }
+  glm::mat4 GetRotationMatrix() const { return m_RotationMatrix; }
+
   glm::vec4 GetForward() const {
     float s = glm::length(m_Velocity);
     return s > 0.001f ? m_Velocity / s : glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
