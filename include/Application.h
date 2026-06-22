@@ -146,6 +146,7 @@ private:
   void TextRendering_ShowVictory();
   void TextRendering_ShowStartScreen();
   void TextRendering_ShowPauseScreen();
+  void TextRendering_ShowEnemyCount();
 
   void Reset();
 

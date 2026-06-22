@@ -93,6 +93,7 @@ void Application::Render() {
   RenderMinimap();
 
   TextRendering_ShowFramesPerSecond();
+  TextRendering_ShowEnemyCount();
   TextRendering_ShowGameOver();
   TextRendering_ShowVictory();
   TextRendering_ShowPauseScreen();

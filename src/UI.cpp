@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Application.constants.h"
 #include "opengl_utils.h"
 #include <cstdio>
 
@@ -162,6 +163,42 @@ void Application::TextRendering_ShowVictory() {
       2.0f,
       glm::vec4(0.2f, 1.0f, 0.2f, 1.0f)
   );
+}
+
+void Application::TextRendering_ShowEnemyCount() {
+  if (m_StartScreen)
+    return;
+
+  constexpr int TOTAL_ENEMIES =
+      TIE_FIGHTER_SQUADRONS * TIE_FIGHTER_SQUADRON_SIZE +
+      TIE_PHANTOM_SQUADRONS * TIE_PHANTOM_SQUADRON_SIZE +
+      TIE_DEFENDER_SQUADRONS * TIE_DEFENDER_SQUADRON_SIZE;
+
+  int remaining = (int)(m_TieFighters.size() + m_TieDefenders.size() + m_TiePhantoms.size());
+  int killed = TOTAL_ENEMIES - remaining;
+
+  float lineheight = TextRendering_LineHeight(m_Window);
+  float charwidth = TextRendering_CharWidth(m_Window);
+
+  char line1[32], line2[32];
+  int n1 = snprintf(line1, sizeof(line1), "Abatidos: %d / %d", killed, TOTAL_ENEMIES);
+  int n2 = snprintf(line2, sizeof(line2), "Restando: %d", remaining);
+
+  float x = -1.0f + charwidth;
+  float y1 = 1.0f - lineheight;
+  float y2 = y1 - lineheight * 1.5f;
+
+  TextRendering_DrawRectangle(m_Window, x - charwidth * 0.5f, y1 + lineheight * 0.8f,
+                              (n1 + 1) * charwidth, lineheight,
+                              glm::vec4(0.0f, 0.0f, 0.0f, 0.5f));
+  TextRendering_DrawRectangle(m_Window, x - charwidth * 0.5f, y2 + lineheight * 0.8f,
+                              (n2 + 1) * charwidth, lineheight,
+                              glm::vec4(0.0f, 0.0f, 0.0f, 0.5f));
+
+  TextRendering_PrintString(m_Window, line1, x, y1, 1.0f,
+                            glm::vec4(0.2f, 1.0f, 0.2f, 1.0f));
+  TextRendering_PrintString(m_Window, line2, x, y2, 1.0f,
+                            glm::vec4(1.0f, 0.4f, 0.4f, 1.0f));
 }
 
 void Application::TextRendering_ShowGameOver() {
