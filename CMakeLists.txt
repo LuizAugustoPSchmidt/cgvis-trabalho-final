@@ -9,7 +9,7 @@ set(SOURCES
   src/main.cpp
   src/Application.cpp
   src/Callbacks.cpp
-  src/Physics.cpp
+  src/collisions.cpp
   src/rendering/Rendering.cpp
   src/UI.cpp
   src/objects/Player.cpp
