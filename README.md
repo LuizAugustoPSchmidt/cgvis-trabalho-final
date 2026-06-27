@@ -11,7 +11,7 @@ Nela, o jogador controla uma nave espacial encarregada de exterminar as naves op
 Para isso, o jogador dispõe de um canhão _laser_ na ponta de cada uma de suas asas.
 Entretanto, também seus oponentes estão munidos de armamento semelhante, e o jogador deve evitar ser atingido por eles.
 
-[Parágrafo Caetano]
+Caetano: implementou colisões, movimentação dos asteróides e do player e os menus do jogo.
 
 Luiz Augusto: inicialmente refatorou o código para se assemelhar a bibliotecas de mais alto nível.
 Também foi responsável por implementar a iluminação do jogo, inserir os modelos de nave, oponentes e asteróides,
