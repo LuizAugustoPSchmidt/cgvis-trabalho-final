@@ -17,4 +17,7 @@ Luiz Augusto: inicialmente refatorou o código para se assemelhar a bibliotecas 
 Também foi responsável por implementar a iluminação do jogo, inserir os modelos de nave, oponentes e asteróides,
 implementar a lógica de movimentação dos oponentes, a câmera de primeira pessoa.
 
-Uso de IAs: durante toda a extensão do projeto, ambos participantes
+Uso de IAs: durante toda a extensão do projeto, ambos participantes utilizaram ferramentas de IA para desenvolvimento.
+Em concreto, foram utilizados o `gemini-cli`, o `antigravity-cli` (`agy`) e o `codex`, que são programas de IAs agênticas.
+Entretanto, não utilizamos em nenhum ponto o chamado `vibe-coding`, pois sempre utilizamos as IAs para tarefas pequenas, supervisionando cada edição ou script rodado.
+Além disso, a dupla realizou análises semanais ponta-a-ponta do código a fim de garantir total compreensão da codebase.
