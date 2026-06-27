@@ -4,6 +4,15 @@ Este repositório contém o código base para o trabalho final. O enunciado comp
 
 https://moodle.ufrgs.br/mod/assign/view.php?id=6018620
 
+## Onde encontrar o projeto completo
+
+Devido a restrições de _filesize_ no Moodle, este `.zip` contém apenas:
+  - a pasta `src/`;
+  - o link para o vídeo de entrega no YouTube;
+  - este README;
+  - o hash do commit de entrega;
+O projeto completo pode ser encontrado [neste link](https://github.com/LuizAugustoPSchmidt/cgvis-lab3-visualizacao)
+
 ## Relatório de Entrega
 
 A aplicação desenvolvida é um jogo inspirado em _Star Wars: Starfighter (2001)_. 
